@@ -11,4 +11,4 @@ elif (year % 100 == 0):
 elif (year % 4 == 0):
     print("Yeah It's a LEAP YEAR")
 else:
-    print("You entered the wrong digits")
+    print("No it's NOT")
