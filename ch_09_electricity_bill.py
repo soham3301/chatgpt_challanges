@@ -4,19 +4,12 @@
 
 unit_used = round(abs(float(input("Enter the electricity unit here: \n"))))
 bill = 0
-tracker = 0
 
 if unit_used <= 100:
-    tracker = 5
-    bill = unit_used * tracker
-    print(f"Your bill is {bill}")
+    print(f"Your bill is {unit_used * 5}")
 elif unit_used <= 200:
-    tracker = 7
-    bill = unit_used * tracker
-    print(f"Your bill is {bill}")
+    print(f"Your bill is {unit_used * 7}")
 elif unit_used > 200:
-    tracker = 10
-    bill = unit_used * tracker
-    print(f"Your bill is {bill}")
+    print(f"Your bill is {unit_used * 10}")
 else:
     print("Enter correct amount")
