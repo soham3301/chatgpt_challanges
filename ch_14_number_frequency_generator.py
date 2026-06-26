@@ -1,7 +1,7 @@
 print("You have to enter 10 numbers")
 
 numbers_list = []
-for numbers in range(0, 10):
+for _ in range(0, 10):
     user_input = int(input("Enter the numbers one by one:\n"))
     numbers_list.append(user_input)
 
