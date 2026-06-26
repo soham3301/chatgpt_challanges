@@ -6,8 +6,8 @@ for _ in range(0, 10):
     numbers_list.append(user_input)
 
 #Largest number:
-largest_number = 0
-for counter in numbers_list:
+largest_number = numbers_list[0]
+for counter in numbers_list[1:]:
     if largest_number < counter:
         largest_number = counter
 print(f"Largest Number: {largest_number}")
