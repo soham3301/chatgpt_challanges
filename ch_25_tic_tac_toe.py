@@ -10,6 +10,7 @@ the_board = '''
 user_input_original_values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 x_board = the_board
 user_input_saved = user_input_original_values
+play_again = True
 # print(the_board)
 # print(computer_guess)
 # print(len(user_input_saved))
@@ -58,52 +59,63 @@ def user_computer_inputs_update(input_number):
 #* Detecting win.
 def win_detection(entered_x_or_o, you_or_comp):
     global x_board
-    for _ in range(0, 1):
-        if x_board[1] == x_board[5] == x_board[9] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[21] == x_board[25] == x_board[29] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[41] == x_board[45] == x_board[49] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[1] == x_board[21] == x_board[41] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[5] == x_board[25] == x_board[45] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[9] == x_board[29] == x_board[49] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[1] == x_board[25] == x_board[49] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        elif x_board[9] == x_board[25] == x_board[41] == entered_x_or_o:
-            print(f"=== {you_or_comp} WON ===")
-        else:
-            return True
+    if x_board[1] == x_board[5] == x_board[9] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[21] == x_board[25] == x_board[29] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[41] == x_board[45] == x_board[49] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[1] == x_board[21] == x_board[41] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[5] == x_board[25] == x_board[45] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[9] == x_board[29] == x_board[49] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[1] == x_board[25] == x_board[49] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    elif x_board[9] == x_board[25] == x_board[41] == entered_x_or_o:
+        print(f"=== {you_or_comp} WON ===")
+    else:
+        return True
 
 #* Play Again?
 def game_reset_and_play_again():
-    global x_board, user_input_saved
+    global x_board, user_input_saved, play_again
     x_board = the_board
     user_input_saved = user_input_original_values
-
+    play_again_input = input("Do you want to play again? Y / N\n").lower()
+    if play_again_input == "n":
+        print("Thanks for playing with us")
+        play_again = False
+    elif play_again_input == "y":
+        play_again = True
+    else:
+        print("Invalid Input")
+        play_again = False
 
 #* The game loop.
 def main():
-    while True:
+    while play_again:
         draw_counter = 5
         while draw_counter != 0:
             position = user_input()
             updating_board_from_user(position)
             if not win_detection("X", "You"):
                 print(f"{x_board}")
-                break
+                if not game_reset_and_play_again() == "y":
+                    break
             updating_board_from_computer()
             if not win_detection("O", "Computer"):
                 print(f"{x_board}")
-                break
+                if not game_reset_and_play_again() == "y":
+                    break
             draw_counter -= 1
         else:
             print("Game Draw")
-            break
+            if not game_reset_and_play_again() == "y":
+                break
 main()
 
-#TODO-1 Introduce the "Play Again" option for user.
-#TODO-2 Bug fix for wrong user input.
+#TODO - Bug fix for wrong user input.
+#TODO - Search for other bugs.
+#TODO - Make the code clean
