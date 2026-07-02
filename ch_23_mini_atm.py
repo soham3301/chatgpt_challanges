@@ -1,5 +1,5 @@
 initial_balance = 5000
-user_input = 0
+# user_input = 0
 
 def menu():
     user_input = int(input("""
