@@ -15,7 +15,6 @@ def correct_position_checker(secret_no, user_choice):
         if secret_no[position_checker] == user_choice[position_checker]:
             correct_position_counter += 1
     print(f"Correct Position: {correct_position_counter}")
-    return correct_position_counter
 
 def wrong_position_checker(secret_no, user_choice):
     wrong_position_counter = 0
@@ -25,7 +24,6 @@ def wrong_position_checker(secret_no, user_choice):
                 if secret_no[position_holder] == user_choice[char_checker]:
                     wrong_position_counter += 1
     print(f"Wrong Position: {wrong_position_counter}")
-    return wrong_position_counter
 
 def game_stopper(sec_no, user_ans):
     if sec_no == user_ans:
