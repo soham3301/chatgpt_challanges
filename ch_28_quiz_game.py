@@ -8,8 +8,9 @@ incorrect_options = [["Toronto", "Rio De Janeiro", "Buenos Aires"], ["Cricketer"
 #! NOT FOR MAIN - Inside board_and_user_input()
 def options_display():
     mixed_answers = []
+    incorrect_options_copy = incorrect_options
     index_for_correct_answers = 0
-    for incorrect in incorrect_options:
+    for incorrect in incorrect_options_copy:
         incorrect.append(correct_answers[index_for_correct_answers])
         index_for_correct_answers += 1
         random.shuffle(incorrect)
