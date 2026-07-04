@@ -1,0 +1,1 @@
+print("This is Mini Calculator with History")
