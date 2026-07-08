@@ -26,9 +26,9 @@ def display_menu():
 
 def add_item():
     item_name = str(input("Enter Item Name: ")).title()
-    item_price = int(input("Enter Item Price: "))
-    item_stock = int(input("Enter Item Stock: "))
     if item_name not in inventory:
+        item_price = int(input("Enter Item Price: "))
+        item_stock = int(input("Enter Item Stock: "))
         total_buying_cost = item_price * item_stock
         if total_buying_cost > treasury["cash_balance"]:
             print(f"You only have ${treasury['cash_balance']} in hand. Can't add Item.")
@@ -42,6 +42,10 @@ def add_item():
             cash_spent = item_price * item_stock
             print(f"{item_stock} {item_name}s added into your Inventory. ${cash_spent} spent.")
             treasury["cash_balance"] -= cash_spent
+    else:
+        restock_some_item = input(f"You already have {item_name} in your inventory. Want to re-stock some? Y / N: ").lower()
+        if restock_some_item == "y":
+            restock_item()
 
 def sell_item():
     item_name = input("Enter Item Name: ").title()
