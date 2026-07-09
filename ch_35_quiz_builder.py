@@ -43,7 +43,6 @@ def program_stopper():
 
 def asking_quiz_question(shuffled, the_score):
     for random_question, the_answer in shuffled.items():
-        print('looping')
         user_answer = input(f"{random_question}?\n").strip().lower()
         if user_answer == the_answer.lower():
             the_score += 1
