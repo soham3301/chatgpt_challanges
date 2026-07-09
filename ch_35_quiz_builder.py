@@ -42,16 +42,19 @@ def program_stopper():
         return False
 
 def asking_quiz_question(shuffled, the_score):
-    random_question, the_answer = random.choice(list(shuffled.items()))                           #!  BUG - Sometimes questions repeats.
-    user_answer = input(f"{random_question}?\n").strip().lower()
-    if user_answer == the_answer.lower():
-        the_score += 1
-        print(f"CORRECT Answer. Score: {the_score}")
-        return the_score
-    else:
-        the_score -= 1
-        print(f"WRONG Answer. Score: {the_score}")
-        return the_score
+    for random_question, the_answer in shuffled.items():
+        print('looping')
+        user_answer = input(f"{random_question}?\n").strip().lower()
+        if user_answer == the_answer.lower():
+            the_score += 1
+            print(f"CORRECT Answer. Score: {the_score}")
+            shuffled.pop(random_question)
+            return the_score
+        else:
+            the_score -= 1
+            print(f"WRONG Answer. Score: {the_score}")
+            shuffled.pop(random_question)
+            return the_score
 
 def round_checker(the_rounds, max_round):
     if the_rounds >= max_round:
