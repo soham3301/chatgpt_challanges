@@ -1,6 +1,8 @@
 import random
-class OpenAccount:
-    master_pin = 12345
+
+#? ===================================   CLASSES   ===================================
+class BankAccount:
+    master_pin = 12345      #! Only Manager knows this
     def __init__(self, name, username, opening_balance, pin):
         self.name = name
         self.username = username
@@ -8,11 +10,25 @@ class OpenAccount:
         self.account_locked = False
         self.balance = opening_balance
         self.pin = pin
+        self.transaction_history = []
+        self.transaction_history.append(f"Opening Balance: {self.balance} INR.")
 
 class Login:
     def __init__(self, account_list):
         self.all_account_list = account_list
     
+    def unlock_account(self, the_item):
+        self.the_account = the_item
+        try:
+            the_master_pin = int(input("Account Locked. Enter Master PIN."))
+            if the_master_pin == BankAccount.master_pin:
+                self.the_account.account_locked = False
+                print("Account Unlocked. You Can Login Now.")
+                return False
+        except ValueError:
+            helper_invalid_input()
+            return False
+
     def login(self):
         if len(self.all_account_list) == 0:
             print("No Account has been created as of now.")
@@ -22,15 +38,7 @@ class Login:
             for item in self.all_account_list:
                 if user_name == item.username:
                     if item.account_locked:
-                        try:
-                            the_master_pin = int(input("Account Locked. Enter Master PIN."))
-                            if the_master_pin == OpenAccount.master_pin:
-                                item.account_locked = False
-                                print("Account Unlocked. You Can Login Now.")
-                                return False
-                        except ValueError:
-                            helper_invalid_input()
-                            return False
+                        self.unlock_account(item)
                     else:
                         max_try = 3
                         while True:
@@ -55,23 +63,36 @@ class Login:
                                     item.account_locked = True
                                     print("ACCOUNT LOCKED")
                                     return False
-                else:
-                    print("Sorry this Username doesn't exist.")
-                    return False
-
+            print("Sorry this Username doesn't exist.")
+            return False
 
 class AccountFeatures:
     def __init__(self, the_account):
         self.account = the_account
 
     def deposit(self):
-        print("Deposit Done")
+        try:
+            deposit_amount = int(input("Enter Amount: "))
+            self.account.balance += deposit_amount
+            self.account.transaction_history.append(f"Deposit: {deposit_amount} INR | Final Balance: {self.account.balance} INR")
+            print("Deposit Done")
+        except ValueError:
+            helper_invalid_input()
 
     def withdraw(self):
-        pass
+        try:
+            withdraw_amount = int(input("Enter Amount: "))
+            if withdraw_amount <= self.account.balance:
+                self.account.balance -= withdraw_amount
+                self.account.transaction_history.append(f"Withdraw: {withdraw_amount} INR | Final Balance: {self.account.balance} INR")
+                print("Withdraw Done")
+            else:
+                print("Insufficient Balance. Operation failed.")
+        except ValueError:
+            helper_invalid_input()
 
     def check_bal(self):
-        pass
+        print(f"Account Balance: INR {self.account.balance}/-")
 
     def display_ac_info(self):
         print(f'''
@@ -80,10 +101,17 @@ Account Holders Name: {self.account.name}
 Account Number: {self.account.account_number}
 Account Balance: {self.account.balance}/-
 ''')
-        
 
     def transaction_history(self):
-        pass
+        for record in self.account.transaction_history:
+            print(record)
+    
+    def calculate_interest(self):
+        print("We Provide Simple Interest of 4% per year.")
+        interest = round(self.account.balance * (4 / 100))
+        print(f"INR {interest} /- generated till now.")
+
+#? ===================================   FUNCTIONS USED INSIDE MAIN   ===================================
 
 def display_board_and_input():
     print("Welcome to OOP Bank. Please choose one option from below.")
@@ -105,26 +133,32 @@ def display_board_and_input():
         helper_invalid_input()
         return True, None
 
-def collect_user_details():
+def collect_user_details(whole_list):
     name = input("Enter your name: ").title()
     username = input("Create username: ").lower()
-    try:
-        pin = int(input("Set PIN: "))
-        confirm_pin = int(input("Confirm PIN: "))
-        if pin == confirm_pin:
-            opening_bal = int(input("Deposit initial amount (Min Rs: 500/-): "))
-            if opening_bal >= 500:
-                print("Account Open Successful.")
-                return [name, username, opening_bal, pin]
+    all_usernames = []
+    for account in whole_list:
+        all_usernames.append(account.username)
+    if username in all_usernames:
+        print("Username already taken.")
+    else:
+        try:
+            pin = int(input("Set PIN: "))
+            confirm_pin = int(input("Confirm PIN: "))
+            if pin == confirm_pin:
+                opening_bal = int(input("Deposit initial amount (Min Rs: 500/-): "))
+                if opening_bal >= 500:
+                    print("Account Open Successful.")
+                    return [name, username, opening_bal, pin]
+                else:
+                    print("At least Rs: 500/- is needed.")
+                    return False
             else:
-                print("At least Rs: 500/- is needed.")
-                return False
-        else:
-            print("PIN Mismatch. Try Again.")
+                print("PIN Mismatch. Try Again.")
+                return None
+        except ValueError:
+            print("Sorry thats an Invalid Input.")
             return None
-    except ValueError:
-        print("Sorry thats an Invalid Input.")
-        return None
 
 def after_login_display_and_user_input():
     try:
@@ -135,12 +169,13 @@ Choose services from below
 3. Check Balance
 4. Display Account Info
 5. Transaction History
-6. Logout
+6. Calculate Interest
+7. Logout
 '''))
-        if user_choice == 6:
+        if user_choice == 7:
             print("Logged Out Successfully.")
             return False, None
-        elif user_choice in [1, 2, 3, 4, 5]:
+        elif user_choice in [1, 2, 3, 4, 5, 6]:
             return True, user_choice
         else:
             helper_invalid_input()
@@ -153,13 +188,16 @@ Choose services from below
 def helper_invalid_input():
     print("That's an Invalid Input. Try Again.")
 
+#? ===================================   MAPPER AND MAIN   ===================================
+
 def command_mapper(the_command, features):
     saved_commands = {
         1: features.deposit,
         2: features.withdraw,
         3: features.check_bal,
         4: features.display_ac_info,
-        5: features.transaction_history
+        5: features.transaction_history,
+        6: features.calculate_interest
     }
     if the_command in saved_commands:
         saved_commands[the_command]()
@@ -182,8 +220,8 @@ def main():
                     else:
                         command_mapper(user_command, all_features)
         elif user_input == 2:
-            account_details = collect_user_details()
+            account_details = collect_user_details(bank_account_list)
             if account_details != None:
-                bank_account_list.append(OpenAccount(account_details[0], account_details[1], account_details[2], account_details[3]))
+                bank_account_list.append(BankAccount(account_details[0], account_details[1], account_details[2], account_details[3]))
 
 main()
