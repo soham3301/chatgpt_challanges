@@ -18,8 +18,6 @@ class Subjects:
             "total_marks":total_mark_of_each_subject
         }
 
-
-
 class Student:
     def __init__(self, name, roll_no, semester_list, subject_wise_marks_lsit):
         self.name = name
@@ -63,19 +61,104 @@ class Student:
             }
         }
 
-    def add_marks(self):
-        print("Marks Added")
+    def helper_grade_calc(self, sem_name):
+        grade_wise_list = []
+        for sub, details in self.subjects[sem_name].items():
+                if details["marks_obtained"] >= 90:
+                    grade_wise_list.append({
+                        "sub_name":details["name"],
+                        "sub_grade":"A+"
+                    })
+                elif details["marks_obtained"] >= 80:
+                    grade_wise_list.append({
+                        "sub_name":details["name"],
+                        "sub_grade":"A"
+                    })
+                elif details["marks_obtained"] >= 60:
+                    grade_wise_list.append({
+                        "sub_name":details["name"],
+                        "sub_grade":"B"
+                    })
+                elif details["marks_obtained"] >= 33:
+                    grade_wise_list.append({
+                        "sub_name":details["name"],
+                        "sub_grade":"C"
+                    })
+                else:
+                    grade_wise_list.append({
+                        "sub_name":details["name"],
+                        "sub_grade":"F"
+                    })
+        return grade_wise_list
 
-    def calculate_percentage(self):
-        total_marks_obtained = sum(self.subject_wise_marks_list)
+    def helper_marks_calc(self):
+        total_marks_obtained_list = []
+        for semester in self.subjects.values():
+            for subject in semester.values():
+                total_marks_obtained_list.append(subject["marks_obtained"])
+        total_marks_obtained = sum(total_marks_obtained_list)
         total_marks = (self.semester_list[0].sub1["total_marks"] * 3) + (self.semester_list[1].sub1["total_marks"] * 3)
         percentage = round((total_marks_obtained / total_marks), 2) * 100
+        return total_marks_obtained, total_marks, percentage
+
+    def helper_add_mark(self):
+        all_subject_names = []
+        enter_subject_name = input("Enter Subject Name: ").title()
+        for sem in self.semester_list:
+            all_subject_names.append(sem.sub1["subject_name"])
+            all_subject_names.append(sem.sub2["subject_name"])
+            all_subject_names.append(sem.sub3["subject_name"])
+        if enter_subject_name in all_subject_names:
+            try:
+                enter_marks = int(input("Enter Marks: "))
+                if enter_marks > 0 and enter_marks <= 100:
+                    previous_mark = 0
+                    for key, value in self.subjects["first_semester"].items():
+                        if value["name"] == enter_subject_name:
+                            previous_mark += value["marks_obtained"]
+                    for key, value in self.subjects["second_semester"].items():
+                        if value["name"] == enter_subject_name:
+                            previous_mark += value["marks_obtained"]
+                    if previous_mark + enter_marks > 100:
+                        return None, None
+                    else:
+                        return enter_subject_name, enter_marks
+                else:
+                    print("This mark is not accaptable")
+                    return None, None
+            except ValueError:
+                helper_invalid()
+                return None, None
+        else:
+            print("This subject is not in your course.")
+            return None, None
+
+    def add_marks(self):
+        sub_name, mark_for_addition = self.helper_add_mark()
+        if sub_name != None:
+            for key, value in self.subjects["first_semester"].items():
+                if value["name"] == sub_name:
+                    value["marks_obtained"] += mark_for_addition
+            for key, value in self.subjects["second_semester"].items():
+                if value["name"] == sub_name:
+                    value["marks_obtained"] += mark_for_addition
+            print("Marks Added")
+
+    def calculate_percentage(self):
+        total_m_obtained, total_m, percentage = self.helper_marks_calc()
         print(f"Percentage : {percentage}%")
 
     def calculate_grade(self):
-        print("Grade Calculated")
+        first_sem_grade_list = self.helper_grade_calc("first_semester")
+        second_sem_grade_list = self.helper_grade_calc("second_semester")
+        print(f"Here is the Grade List of {self.name}")
+        for result in first_sem_grade_list:
+            print(f"{result["sub_name"]}: {result["sub_grade"]}")
+        for result in second_sem_grade_list:
+            print(f"{result["sub_name"]}: {result["sub_grade"]}")
 
     def print_report(self):
+        total_m_obtained, total_m, percentage = self.helper_marks_calc()
         print(f'''
 Student Name: {self.name}
 Roll Number: {self.roll_no}
@@ -90,11 +173,13 @@ Subject Wise Marks:
 {self.subjects["second_semester"]["subject_1"]["name"]}: {self.subjects["second_semester"]["subject_1"]["marks_obtained"]} / {self.subjects["second_semester"]["subject_1"]["total_marks"]}
 {self.subjects["second_semester"]["subject_2"]["name"]}: {self.subjects["second_semester"]["subject_2"]["marks_obtained"]} / {self.subjects["second_semester"]["subject_2"]["total_marks"]}
 {self.subjects["second_semester"]["subject_3"]["name"]}: {self.subjects["second_semester"]["subject_3"]["marks_obtained"]} / {self.subjects["second_semester"]["subject_3"]["total_marks"]}
+Total: {total_m_obtained} / {total_m}
+Percentage: {percentage}
 ''')
 
     def check_gpa(self):
-        print("GPA Calculated")
-
+        #!NOTE: I don't know how to calculate GPA, Leaving it as of now.
+        print("GPA Unavailable as of now")
 
 def add_subjects():
     subjects = []
@@ -176,8 +261,24 @@ def after_login_user_input():
         helper_invalid()
         return True, None
 
-def rank_students(the_whole_list):          #! The whole list operation
-    print("All student list printed")
+def rank_students(the_whole_list):
+    students_with_their_percentage = []
+    for student in the_whole_list:
+        obtained, total, percentage = student.helper_marks_calc()
+        name = student.name
+        students_with_their_percentage.append({
+            "name":name,
+            "percentage":percentage
+        })
+    n = len(students_with_their_percentage)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            current_student_pct = students_with_their_percentage[j]['percentage']
+            next_student_pct = students_with_their_percentage[j + 1]['percentage']
+            if current_student_pct < next_student_pct:
+                students_with_their_percentage[j], students_with_their_percentage[j + 1] = students_with_their_percentage[j + 1], students_with_their_percentage[j]
+    for student in students_with_their_percentage:
+        print(f"Name: {student["name"]} | Percentage: {student["percentage"]}")
 
 def after_login_command_mapper(single_student, all_students, the_command):
     saved_commands = {
@@ -217,7 +318,6 @@ def enter_into_student_report_card(all_students_list):
 def helper_invalid():
     print("Invalid Input")
 
-
 def main():
     all_subjects = []
     all_students = []
@@ -251,7 +351,7 @@ def main():
                     else:
                         roll_number += 1
                         print(f"Student added. Roll Number: {roll_number}")
-                        added_student = Student(name, roll_number, [first_sem_subjects, second_sem_subjects], [sub_wise_marks])
+                        added_student = Student(name, roll_number, [first_sem_subjects, second_sem_subjects], sub_wise_marks)
                         all_students.append(added_student)
                 elif user_input == 2:
                     enter_into_student_report_card(all_students)
@@ -259,8 +359,5 @@ def main():
             helper_invalid()
     else:
         helper_invalid()
-
-
-
 
 main()
