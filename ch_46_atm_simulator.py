@@ -58,18 +58,27 @@ class ATM:
             return False
     
     def activate_transaction_list(self, the_ac):
-        the_ac.transaction_list.append({
-            "Opening Bal":the_ac.balance
-        })
+        if not the_ac.transaction_list:
+            the_ac.transaction_list.append({
+                "Opening Bal":the_ac.balance
+            })
     
     def deposit_recorder(self, the_ac, the_amount):
         the_ac.transaction_list.append({
-            "Deposit":the_amount
+            "Deposit":f"+{the_amount} /-"
         })
     
     def withdraw_recorder(self, the_ac, the_amount):
         the_ac.transaction_list.append({
-            "Withdraw":the_amount
+            "Withdraw":f"-{the_amount} /-"
+        })
+    
+    def transfer_recorder(self, from_ac, to_ac, amount):
+        from_ac.transaction_list.append({
+            f"To {to_ac.name}":f"-{amount} /-"
+        })
+        to_ac.transaction_list.append({
+            f"From {from_ac.name}":f"+{amount} /-"
         })
 
 
@@ -86,7 +95,7 @@ class ATM:
                     if attempt == 0:
                         the_account.is_locked = True
                         the_otp = round(random.random() * 1000000)
-                        the_account.otp += the_otp
+                        the_account.otp = the_otp
                         the_inbox = Mobile(the_account.mobile_no, the_otp)
                         return False, the_inbox
                     else:
@@ -122,6 +131,7 @@ class ATM:
                 for account in self.account_list:
                     if account.account_number == the_ac_no and account.name != my_account.name:
                         self.activate_transaction_list(account)
+                        self.transfer_recorder(my_account, account, the_amount)
                         account.balance += the_amount
                         my_account.balance -= the_amount
                         return True
@@ -133,7 +143,11 @@ class ATM:
     
     def balance_check(self, mobile_number):
         the_account = self.find_account(mobile_number)
-        return f"The Account Balance is: INR {the_account.balance} /-"
+        return [{
+            "Your Account Number:":the_account.account_number
+        },{
+            "Your Account Balance:":f"INR {the_account.balance} /-"
+        }]
     
     def transaction_history(self, mobile_number):
         the_account = self.find_account(mobile_number)
@@ -150,7 +164,7 @@ def display_board():
 def user_input():
     try:
         user_choice = int(input("Choose from above: "))
-        if user_choice == 0:
+        if user_choice == 0:            #! User should not know to how stop the atm
             return False, None
         elif user_choice in [1, 2, 3, 4]:
             return True, user_choice
@@ -221,7 +235,7 @@ def get_amount():
         return None
 
 def get_ac_no(the_atm):
-    #! In real world, user needs to know the ac no of another user to transfer money.
+    #! In real world, user needs to know the ac no of another user to transfer money. 
     for account in the_atm.account_list:
         print(f"{account.account_number} -- {account.name}")
     try:
@@ -230,7 +244,22 @@ def get_ac_no(the_atm):
         return ac_no, amount
     except ValueError:
         helper_invalid_input()
-        return None
+        return None, None
+
+def print_report(report):
+    for record in report:
+        for key, value in record.items():
+            print(f"{key}: {value}")
+
+def get_details_to_open_account():
+    name = input("Enter Your Name: ").title()
+    mobile_no = get_mobile_number()
+    opening_balance = get_amount()
+    pin = get_pin()
+    if name and mobile_no and opening_balance and pin:
+        return name, mobile_no, opening_balance, pin
+    else:
+        return None, None, None, None
 
 def command_mapper(user_choice, atm, mobile_no):
     atm_functions = {
@@ -272,7 +301,7 @@ def command_mapper(user_choice, atm, mobile_no):
             helper_invalid_input()
     elif user_choice in [4, 5]:
         the_report = atm_functions[user_choice](mobile_no)
-        print(the_report)
+        print_report(the_report)
     else:
         helper_invalid_input()
 
@@ -336,7 +365,12 @@ def main():
             else:
                 print("Your Account is not Locked.")
         elif user_choice == 4:
-            ...
+            name, phone_no, opening_bal, pin = get_details_to_open_account()
+            if name and phone_no and opening_bal and pin:
+                demo_account_list.append(Account(name, phone_no, opening_bal, pin))
+                print("Account Open Successfull.")
+            else:
+                helper_invalid_input()
         else:
             helper_invalid_input()
 
