@@ -133,12 +133,12 @@ class CEO(Employee):
         print(len(the_company.emp_list))
         return True
 
-    def fire_employee(self, fire_name, the_compnay, all_depts):
+    def fire_employee(self, fire_name, the_company, all_depts):
         the_name = fire_name.title()
         if self.helper_check_dept_emp(the_name, all_depts):
-            for emp in the_compnay.emp_list:
+            for emp in the_company.emp_list:
                 if emp.name == the_name:
-                    the_compnay.emp_list.remove(emp)
+                    the_company.emp_list.remove(emp)
                     return True
             return False
         else:
@@ -165,26 +165,27 @@ class CEO(Employee):
         else:
             return False
 
-    def give_promotion(self):
-        print("You are promoted")
+    def give_promotion(self, staff_name, role, the_company):
+        if staff_name and role and the_company:
+            for staff in the_company.emp_list:
+                if staff.name == staff_name.title():
+                    staff.role = role
+                    return True
+            return False
 
-    def add_new_department(self):
-        print("New Department Added")
+    def add_new_department(self, new_name, company):
+        if new_name and company:
+            company.dept_list.append(Department(new_name))
+            return True
+        else:
+            return False
 
-    def attach_employee_to_a_department(self):
-        print("Employee Attached")
-
-    def deattach_employee_from_a_department(self):
-        print("Employee De-attached")
-
-    def attach_manager_to_a_department(self):
-        print("Manager Attached")
-
-    def deattach_manager_from_a_department(self):
-        print("Manager De-attached")
-
-    def allot_work_to_anyone(self):
-        print("Work Alloted")
+    def allot_work_to_anyone(self, staff):
+        if staff:
+            staff.inbox.append(["Work Added from CEO"])
+            return True
+        else:
+            return False
 
 #* ---------------------------------------------------------------------------------------------------
 
@@ -210,7 +211,7 @@ class Department:
             emp_box.append(emp)
         return emp_box
 
-class Compnay:
+class Company:
     def __init__(self, company_name):
         self.company_name = company_name
         self.budget = 12000000
@@ -295,12 +296,8 @@ def display_ceo_board():
 6. Fire Manager
 7. Give Promotion
 8. Add New Department
-9. Attach Employee to a Department
-10. De-attach Employee from a Department
-11. Attach Manager to a Department
-12. De-attach Manager from a Department
-13. Allot Work to Anyone
-14. Logout
+9. Allot Work to Anyone
+10. Logout
 ''')
 
 def display_accountant_board():
@@ -372,6 +369,9 @@ def logout_print():
 def available_employees():
     print("Available Employees")
 
+def role_chooser():
+    return input("Enter Role: ").lower()
+
 def display_financial_report(data):
     print(f"Available Budget to spend: {data[0]}/-")
     print(f"Amount for upcoming Salary: {data[2]}/-")
@@ -407,10 +407,14 @@ def get_dept(staff, all_depts):
         if the_dept.department_manager[0].id == staff.id:
             return the_dept
 
-def display_all_employees(the_compnay):
-    for emp in the_compnay.emp_list:
+def display_all_employees(the_company):
+    for emp in the_company.emp_list:
         print(f"Name: {emp.name} | Role: {emp.role}")
 
+def display_all_departments(the_company):
+    print("Available Departments")
+    for dept in the_company.dept_list:
+        print(dept.department_name.title())
 
 #? ------------------------MAPPERS------------------------
 
@@ -424,7 +428,7 @@ def role_mapper(employee):
     if employee.role in saved_roles_displays:
         saved_roles_displays[employee.role]()
 
-def employee_functions_mapper(the_staff, user_choice, depts, compnay):
+def employee_functions_mapper(the_staff, user_choice, depts, company):
     if user_choice == 1:
         the_name, the_salary = the_staff.show_salary()
         salary_print(the_name, the_salary)
@@ -434,7 +438,7 @@ def employee_functions_mapper(the_staff, user_choice, depts, compnay):
     else:
         display_invalid_input()
 
-def manager_functions_mapper(the_staff, user_choice, depts, compnay):
+def manager_functions_mapper(the_staff, user_choice, depts, company):
     dept = get_dept(the_staff, depts)
     emp_list = dept.return_dept_employees()
     if user_choice == 1:
@@ -461,7 +465,7 @@ def manager_functions_mapper(the_staff, user_choice, depts, compnay):
         input_name = user_input_name()
         for empl in emp_list:
             if empl.name.lower() == input_name:
-                if the_staff.recommend_promotion(compnay, empl):
+                if the_staff.recommend_promotion(company, empl):
                     print("Recommended for Promotion")
                     return
     elif user_choice == 5:
@@ -470,8 +474,8 @@ def manager_functions_mapper(the_staff, user_choice, depts, compnay):
     else:
         display_invalid_input()
 
-def accountant_functions_mapper(the_staff, user_choice, depts, compnay):
-    emp_list = compnay.emp_list
+def accountant_functions_mapper(the_staff, user_choice, depts, company):
+    emp_list = company.emp_list
     if user_choice == 1:
         the_name, the_salary = the_staff.show_salary()
         salary_print(the_name, the_salary)
@@ -480,20 +484,20 @@ def accountant_functions_mapper(the_staff, user_choice, depts, compnay):
         show_inbox(inbox)
     elif user_choice == 3:
         print_available_depts(depts)
-        print(f"Available Budget: {compnay.budget} /-")
+        print(f"Available Budget: {company.budget} /-")
         dept_name = user_input_name()
-        amount = choose_amount(compnay.budget)
+        amount = choose_amount(company.budget)
         if amount:
             for dept in depts:
                 if dept.department_name == dept_name.title():
-                    if the_staff.allot_budget_to_depts(dept, compnay, amount):
+                    if the_staff.allot_budget_to_depts(dept, company, amount):
                         print(f"Budget Allocated to {(dept_name).title()}")
                     else:
                         print("Budget Allocation Failed.")
         else:
             print("Budget Restriction")
     elif user_choice == 4:
-        if the_staff.give_salary(emp_list, compnay):
+        if the_staff.give_salary(emp_list, company):
             print("Salary Given")
         else:
             print("Not Enough Budget")
@@ -503,7 +507,7 @@ def accountant_functions_mapper(the_staff, user_choice, depts, compnay):
         staff_name = user_input_name()
         for emp in emp_list:
             if emp.name == staff_name.title():
-                new_amount = choose_amount(compnay.budget)
+                new_amount = choose_amount(company.budget)
                 if new_amount:
                     if the_staff.increase_salary(emp, new_amount):
                         print("Salary Increased")
@@ -513,13 +517,13 @@ def accountant_functions_mapper(the_staff, user_choice, depts, compnay):
                 else:
                     display_invalid_input()
     elif user_choice == 6:
-        the_report_data = the_staff.print_financial_report(compnay)
+        the_report_data = the_staff.print_financial_report(company)
         display_financial_report(the_report_data)
     else:
         display_invalid_input()
 
 
-def ceo_functions_mapper(the_staff, user_choice, depts, compnay):
+def ceo_functions_mapper(the_staff, user_choice, depts, company):
     if user_choice == 1:
         the_name, the_salary = the_staff.show_salary()
         salary_print(the_name, the_salary)
@@ -529,31 +533,59 @@ def ceo_functions_mapper(the_staff, user_choice, depts, compnay):
     elif user_choice == 3:
         new_emp_name = user_input_name()
         if new_emp_name:
-            if the_staff.hire_employee(new_emp_name, compnay):
+            if the_staff.hire_employee(new_emp_name, company):
                 print("Employee Joined Company")
         else:
             display_invalid_input()
     elif user_choice == 4:
-        display_all_employees(compnay)
+        display_all_employees(company)
         choosen_name = user_input_name()
-        if the_staff.fire_employee(choosen_name, compnay, depts):
+        if the_staff.fire_employee(choosen_name, company, depts):
             print("Employee Removed")
         else:
             print("Employee Not Removed")
     elif user_choice == 5:
         new_manager_name = user_input_name()
         if new_manager_name:
-            if the_staff.hire_manager(new_manager_name, compnay):
+            if the_staff.hire_manager(new_manager_name, company):
                 print("Manager Joined Company")
         else:
             display_invalid_input()
     elif user_choice == 6:
-        display_all_employees(compnay)
+        display_all_employees(company)
         choosen_manager = user_input_name()
-        if the_staff.fire_manager(choosen_manager, compnay, depts):
+        if the_staff.fire_manager(choosen_manager, company, depts):
             print("Manager Removed")
         else:
             print("Manager Not Removed")
+    elif user_choice == 7:
+        available_employees()
+        display_all_employees(company)
+        choosen_staff = user_input_name()
+        new_role = role_chooser()
+        if the_staff.give_promotion(choosen_staff, new_role, company):
+            print("Employee Promoted")
+        else:
+            print("Promotion Not Given")
+    elif user_choice == 8:
+        display_all_departments(company)
+        new_dept_name = user_input_name()
+        if the_staff.add_new_department(new_dept_name, company):
+            print("Department Added")
+        else:
+            print("Department Not Added")
+    elif user_choice == 9:
+        available_employees()
+        display_all_employees(company)
+        target_staff_name = user_input_name()
+        for target_staff in company.emp_list:
+            if target_staff.name == target_staff_name.title():
+                if the_staff.allot_work_to_anyone(target_staff):
+                    print("Work Alloted")
+                    return
+        print("Work Aloocation Failed")
+    else:
+        display_invalid_input()
 
 def user_choice_mapper(staff, user_input, all_depts, brand):
     mapper_functions = {
@@ -575,12 +607,12 @@ def exit_check(staff, command):
     elif staff.role == "accountant" and command == 7:
         logout_print()
         return True
-    elif staff.role == "ceo" and command == 14:
+    elif staff.role == "ceo" and command == 10:
         logout_print()
         return True
 
 def main():
-    rebelcode = Compnay("Rebelcode")
+    rebelcode = Company("Rebelcode")
     for emp in all_staff_list:
         rebelcode.helper_employee_adding(emp)
     for dept in all_department_list:
