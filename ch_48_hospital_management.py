@@ -119,16 +119,16 @@ class Patient(Person):
 
     def check_bill(self):
         bill = 0
-        for bill in self.billbox:
-            bill += bill
+        for my_bill in self.billbox:
+            bill += my_bill
         return bill
 
     def pay_bill(self, generated_bill, received_amount):
         if received_amount >= generated_bill:
             self.billbox.clear()
-            return received_amount - generated_bill
+            return True, received_amount - generated_bill
         else:
-            return None
+            return False, None
 
 class Ward:
     def __init__(self, name):
@@ -273,13 +273,38 @@ class Hospital:
         the_doctor = self.helper_get_doctor(doctor_name)
         if the_patient and the_doctor:
             the_doctor.assigned_patients.append(the_patient)
+            the_doctor.inbox.append({
+                "Got a new patient assigned":the_patient.name,
+            })
             the_patient.billbox.append(the_doctor.fee)
+            the_patient.inbox.append({
+                "Doctor assigned to you":the_doctor.name,
+            })
             return True
         else:
             return False
 
-    def discharge_patient(self):
-        print("Patient Discharged")
+    def discharge_patient(self, patient_name):
+        the_patient = self.helper_get_patient(patient_name)
+        if the_patient:
+            total_bill = sum(the_patient.billbox)
+            if not total_bill:
+                for ward in self.wards:
+                    for bed in ward.beds:
+                        if bed.occupied:
+                            if bed.occupied.name == the_patient.name:
+                                bed.occupied = None
+                for patient in self.patients:
+                    if patient.name == the_patient.name:
+                        self.patients.remove(patient)
+                return True
+            else:
+                the_patient.inbox.append({
+                    "Pay bill for discharge": total_bill
+                })
+                return False
+
+
 
 sample_doctors = [
     Doctor("Kallol", 11, "ent", 25),
@@ -365,6 +390,13 @@ def get_name():
 def get_speciality():
     return input("Enter Speciality: ")
 
+def get_bill():
+    try:
+        return abs(round(int(input("Enter Bill Amount: "))))
+    except:
+        invalid_input()
+        return None
+
 def get_fee():
     try:
         return abs(round(int(input("Enter Fee: "))))
@@ -408,6 +440,16 @@ def display_mapper(user):
     if user.status in saved_displays:
         saved_displays[user.status]()
 
+def print_details(user_data):
+    print(f"Name: {user_data[0].title()} | ID: {user_data[1]} | Password: {user_data[2]}")
+
+def print_inbox(the_inbox):
+    if the_inbox:
+        for item in the_inbox:
+            for key, value in item.items():
+                print(f"{key}: {value}")
+    else:
+        print("Your Inbox is Empty")
 
 def display_wards(hospital):
     for ward in hospital.wards:
@@ -481,6 +523,24 @@ def display_doc_assigned(consent, patient_name, doctor_name):
     else:
         print("Doctor not Assigned.")
 
+def display_discharge_status(consent, patient_name):
+    if consent:
+        print(f"Patient named {patient_name.title()} has been discharged.")
+    else:
+        print(f"{patient_name.title()} has not been discharged.")
+
+def print_final_bill(bill):
+    print(f"Your Total Bill is INR: {bill} /- as of now.")
+
+def display_bill_status(consent):
+    if consent:
+        print(f"You Paid the bill. Congrats")
+    else:
+        print("Bill Payment Not Done.")
+
+def display_return_amount(return_amount):
+    print(f"Here is your return amount, INR {return_amount} /-")
+
 def display_logged_out():
     print("logged Out")
 
@@ -522,34 +582,9 @@ def patient_display():
     print('''
 1. Check Details
 2. Check Inbox
-3. Check Bill
-4. Pay Bill
+3. Pay Bill
 0. Exit
 ''')
-
-#* ----------------------------------------- FUNCTIONS ------------------------------------------
-
-def print_details(user_data):
-    print(f"Name: {user_data[0].title()} | ID: {user_data[1]} | Password: {user_data[2]}")
-
-def print_inbox(the_inbox):
-    if the_inbox:
-        for item in the_inbox:
-            print(f"{item.key()}: {item.value()}")
-    else:
-        print("Your Inbox is Empty")
-
-
-
-
-
-
-
-
-
-
-
-
 
 #* ----------------------------------------- DISPATCHERS ------------------------------------------
 
@@ -625,13 +660,43 @@ def admin_mapper(the_user, the_input, the_hospital):
             display_doc_assigned(1, name_of_patient, name_of_doctor)
         else:
             display_doc_assigned(0, name_of_patient, name_of_doctor)
+    elif the_input == "9":
+        display_all_patients(the_hospital)
+        the_patient_name = get_name()
+        if the_hospital.discharge_patient(the_patient_name.title()):
+            display_discharge_status(1, the_patient_name)
+        else:
+            display_discharge_status(0, the_patient_name)
+    else:
+        invalid_input()
 
 
 def doctor_mapper(the_user, the_input, the_hospital):
     print("You Reached Doctor Mapper")
 
 def patient_mapper(the_user, the_input, the_hospital):
-    print("You Reached Patient Mapper")
+    if the_input == "1":
+        data = the_user.check_details()
+        print_details(data)
+    elif the_input == "2":
+        inbox = the_user.check_inbox()
+        print_inbox(inbox)
+    elif the_input == "3":
+        final_bill = the_user.check_bill()
+        print_final_bill(final_bill)
+        bill_amount = get_bill()
+        if bill_amount:
+            done_or_not, amount = the_user.pay_bill(final_bill, bill_amount)
+            if done_or_not:
+                display_bill_status(1)
+                if amount:
+                    display_return_amount(amount)
+            else:
+                display_bill_status(0)
+        else:
+            invalid_input()
+    else:
+        invalid_input()
 
 def input_dispatcher(user, input, hospital):
     saved_input_mapper_functions = {
