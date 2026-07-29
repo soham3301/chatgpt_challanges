@@ -40,14 +40,20 @@ class Admin(Person):
 
     def add_new_ward(self, ward_name, hospital):
         if ward_name:
-            hospital.wards.append(Ward(ward_name))
-            return True
+            existing_ward_names = []
+            for ward in hospital.wards:
+                existing_ward_names.append(ward.name)
+            if ward_name in existing_ward_names:
+                return False
+            else:
+                hospital.wards.append(Ward(ward_name))
+                return True
         else:
             return False
 
     def add_new_med(self, med_name, med_cost, hospital):
         if med_name and med_cost:
-            hospital.meds.append(Medicine(med_name, med_cost))
+            hospital.meds.append(Medicine(med_name, int(med_cost)))
             return True
         else:
             return False
@@ -78,6 +84,16 @@ class Doctor(Person):
 
     def check_assigned_patients(self):
         return self.assigned_patients
+
+    def check_ward_patients(self, hospital):
+        patients = []
+        for ward in hospital.wards:
+            if ward.supervisor == self.specialist:
+                for bed in ward.beds:
+                    if bed.occupied:
+                        patients.append(bed.occupied)
+        return patients
+
 
     def reccomend_medicine(self, medicine_name, medicine_list, the_admin, the_patient):
         the_medicine = self.helper_get_medicine(medicine_list, medicine_name, the_admin)
@@ -144,7 +160,7 @@ class Ward:
 class Bed:
     def __init__(self, number):
         self.bed_number = number
-        self.patient = None
+        self.occupied = None
         self.charge = 20
 
 class Medicine:
@@ -167,6 +183,24 @@ class Hospital:
                 return ward
         return None
 
+    def helper_get_patient(self, name):
+        if name:
+            for patient in self.patients:
+                if patient.name == name:
+                    return patient
+            return None
+        else:
+            return None
+
+    def helper_get_doctor(self, name):
+        if name:
+            for doctor in self.doctors:
+                if doctor.name == name:
+                    return doctor
+            return None
+        else:
+            return None
+
     def helper_add_patient(self, data):
         if data[0] and data[1]:
             the_patient = Patient(data[0], data[1])
@@ -176,7 +210,7 @@ class Hospital:
         else:
             return None
 
-    def add_new_bed(self, ward_name):
+    def add_new_bed(self, the_ward):
         new_bed_no = 0
         available_beds = []
         for ward in self.wards:
@@ -186,7 +220,6 @@ class Hospital:
             if bed_no > new_bed_no:
                 new_bed_no = bed_no
         new_bed_no += 1
-        the_ward = self.helper_get_ward(ward_name)
         if new_bed_no and the_ward:
             if the_ward.add_bed(new_bed_no):
                 return True
@@ -199,11 +232,12 @@ class Hospital:
             the_ward = self.helper_get_ward(ward_name)
             if new_patient and the_ward:
                 for bed in the_ward.beds:
-                    if bed.patient == None:
+                    if not bed.occupied:
                         new_patient.is_admitted = True
                         new_patient.billbox.append(bed.charge)
-                        bed.patient = new_patient
+                        bed.occupied = new_patient
                         return True
+                return False
             else:
                 return False
         else:
@@ -234,23 +268,18 @@ class Hospital:
                         return None
             return None
 
-    def assign_doctor(self):
-        print("Doctor Assigned")
+    def assign_doctor(self, patient_name, doctor_name):
+        the_patient = self.helper_get_patient(patient_name)
+        the_doctor = self.helper_get_doctor(doctor_name)
+        if the_patient and the_doctor:
+            the_doctor.assigned_patients.append(the_patient)
+            the_patient.billbox.append(the_doctor.fee)
+            return True
+        else:
+            return False
 
     def discharge_patient(self):
         print("Patient Discharged")
-
-sample_patients = [
-    Patient("Rajiv", 1),
-    Patient("Amitabh", 2),
-    Patient("Souvik", 3),
-    Patient("Subhadeep", 4),
-    Patient("Manidipa", 5),
-    Patient("Joydeep", 6),
-    Patient("Gautam", 7),
-    Patient("Rohan", 8),
-    Patient("Shouni", 9),
-]
 
 sample_doctors = [
     Doctor("Kallol", 11, "ent", 25),
@@ -302,16 +331,21 @@ for doctor in sample_doctors:
     doctor.helper_generate_id()
     goodcare.doctors.append(doctor)
 
-for patient in sample_patients:
-    patient.helper_generate_id()
-    goodcare.patients.append(patient)
-
 for ward in total_wards:
     goodcare.wards.append(ward)
 
 for med in total_meds:
     goodcare.meds.append(med)
 
+goodcare.admit_patient(["Rajiv", 1], "ent")
+goodcare.admit_patient(["Amitabh", 2], "ent")
+goodcare.admit_patient(["Souvik", 3], "gastro")
+goodcare.admit_patient(["Subhadeep", 4], "cardio")
+goodcare.admit_patient(["Manidipa", 5], "cardio")
+goodcare.admit_patient(["Joydeep", 6], "cardio")
+goodcare.admit_patient(["Gautam", 7], "children")
+goodcare.admit_patient(["Rohan", 8], "children")
+goodcare.admit_patient(["Shouni", 9], "emergency")
 
 
 #* ----------------------------------------- INPUTS ------------------------------------------
@@ -325,6 +359,36 @@ def get_password():
 def get_input():
     return input("Choose from above: ")
 
+def get_name():
+    return input("Enter Name: ")
+
+def get_speciality():
+    return input("Enter Speciality: ")
+
+def get_fee():
+    try:
+        return abs(round(int(input("Enter Fee: "))))
+    except ValueError:
+        invalid_input()
+        return None
+
+def get_cost():
+    try:
+        return abs(round(int(input("Enter Cost: "))))
+    except ValueError:
+        invalid_input()
+        return None
+
+def get_how_many():
+    try:
+        number_of_beds = abs(round(int(input("Enter number of beds: "))))
+        if number_of_beds > 0 and number_of_beds <= 5:
+            return number_of_beds
+        else:
+            return None
+    except ValueError:
+        invalid_input()
+        return None
 
 
 
@@ -343,6 +407,85 @@ def display_mapper(user):
     }
     if user.status in saved_displays:
         saved_displays[user.status]()
+
+
+def display_wards(hospital):
+    for ward in hospital.wards:
+        print(ward.name.title())
+
+def choose_from_above(data):
+    print(f"Please choose a {data} from above")
+
+def choose_something_new(data):
+    print(f"These {data} are available, choose something new.")
+
+def choose_between():
+    print("Choose between 1 to 5.")
+
+def invalid_input():
+    print("Invalid Input")
+
+def doctor_add_announcment(consent):
+    if consent:
+        print("Doctor Added to Hospital")
+    else:
+        print("Doctor Recruitment Failed")
+
+def ward_add_announcment(consent):
+    if consent:
+        print("Ward Added to Hospital")
+    else:
+        print("Ward addition Failed")
+
+def med_add_announcment(consent):
+    if consent:
+        print("Medicine Added into Hospital")
+    else:
+        print("Medicine addition Failed")
+
+def bed_addition_announcment(consent, the_ward, no_of_beds):
+    if consent:
+        print(f"{the_ward.name.title()} ward got {no_of_beds} new beds.")
+    else:
+        print("New bed not added.")
+
+def display_empty_beds(hospital):
+    for ward in hospital.wards:
+        total_beds = 0
+        occupied_beds = 0
+        for bed in ward.beds:
+            if bed.occupied:
+                occupied_beds += 1
+            total_beds += 1
+        print(f"{ward.name.title()} ward has {total_beds - occupied_beds} free beds.")
+
+def display_admit_confirmation(consent, name_of_patient, name_of_ward):
+    if consent:
+        print(f"{name_of_patient.title()} has been admitted into {name_of_ward.title()} ward.")
+    else:
+        print("Patient Admision Failed.")
+
+def display_all_patients(hospital):
+    print("ALL PATIENT NAMES")
+    for patient in hospital.patients:
+        print(patient.name.title())
+
+def display_all_doctors(hospital):
+    print("ALL DOCTORS")
+    for doc in hospital.doctors:
+        print(f"Name: {doc.name.title()} | Speciality: {doc.specialist}")
+
+def display_doc_assigned(consent, patient_name, doctor_name):
+    if consent:
+        print(f"Doctor {doctor_name.title()} has been assigned to {patient_name.title()}.")
+    else:
+        print("Doctor not Assigned.")
+
+def display_logged_out():
+    print("logged Out")
+
+def display_user_not_found():
+    print("User Not Found")
 
 def admin_display():
     print('''
@@ -389,6 +532,12 @@ def patient_display():
 def print_details(user_data):
     print(f"Name: {user_data[0].title()} | ID: {user_data[1]} | Password: {user_data[2]}")
 
+def print_inbox(the_inbox):
+    if the_inbox:
+        for item in the_inbox:
+            print(f"{item.key()}: {item.value()}")
+    else:
+        print("Your Inbox is Empty")
 
 
 
@@ -408,6 +557,75 @@ def admin_mapper(the_user, the_input, the_hospital):
     if the_input == "1":
         data = the_user.check_details()
         print_details(data)
+    elif the_input == "2":
+        inbox = the_user.check_inbox()
+        print_inbox(inbox)
+    elif the_input == "3":
+        name = get_name()
+        password = get_password()
+        speciality = get_speciality()
+        fee = get_fee()
+        if name and password and speciality and fee:
+            if the_user.add_new_doctor([name.title(), password, speciality.lower(), fee], the_hospital):
+                doctor_add_announcment(1)
+            else:
+                doctor_add_announcment(0)
+        else:
+            invalid_input()
+    elif the_input == "4":
+        display_wards(the_hospital)
+        choose_something_new("wards")
+        ward_name = get_name()
+        if ward_name:
+            if the_user.add_new_ward(ward_name.lower(), the_hospital):
+                ward_add_announcment(1)
+            else:
+                ward_add_announcment(0)
+        else:
+            invalid_input()
+    elif the_input == "5":
+        medicine_name = get_name()
+        medicine_cost = get_cost()
+        if medicine_name and medicine_cost:
+            if the_user.add_new_med(medicine_name, medicine_cost, the_hospital):
+                med_add_announcment(1)
+            else:
+                med_add_announcment(0)
+        else:
+            invalid_input()
+    elif the_input == "6":
+        display_wards(the_hospital)
+        choose_from_above("ward")
+        ward_name = get_name()
+        choose_between()
+        how_many_beds = get_how_many()
+        ward = the_hospital.helper_get_ward(ward_name.lower())
+        if ward and how_many_beds:
+            for _ in range(how_many_beds):
+                the_hospital.add_new_bed(ward)
+            bed_addition_announcment(1, ward, how_many_beds)
+        else:
+            bed_addition_announcment(0, ward, how_many_beds)
+    elif the_input == "7":
+        patient_name = get_name()
+        patient_password = get_password()
+        display_empty_beds(the_hospital)
+        choose_from_above("ward")
+        ward_name = get_name()
+        if the_hospital.admit_patient([patient_name.title(), patient_password], ward_name.lower()):
+            display_admit_confirmation(1, patient_name, ward_name)
+        else:
+            display_admit_confirmation(0, patient_name, ward_name)
+    elif the_input == "8":
+        display_all_patients(the_hospital)
+        name_of_patient = get_name()
+        display_all_doctors(the_hospital)
+        name_of_doctor = get_name()
+        if the_hospital.assign_doctor(name_of_patient.title(), name_of_doctor.title()):
+            display_doc_assigned(1, name_of_patient, name_of_doctor)
+        else:
+            display_doc_assigned(0, name_of_patient, name_of_doctor)
+
 
 def doctor_mapper(the_user, the_input, the_hospital):
     print("You Reached Doctor Mapper")
@@ -431,17 +649,17 @@ def main():
         password = get_password()
         the_user = goodcare.authentication(id, password)
         if the_user:
+            display_welcome_board(the_user)
             while True:
-                display_welcome_board(the_user)
                 display_mapper(the_user)
                 user_input = get_input()
                 if user_input == "0":
-                    print("logged Out")
+                    display_logged_out()
                     break
                 else:
                     input_dispatcher(the_user, user_input, goodcare)
         else:
-            print("User Not Found")
+            display_user_not_found()
             break
 
 main()
