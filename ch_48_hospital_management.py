@@ -386,6 +386,8 @@ def patient_display():
 
 #* ----------------------------------------- FUNCTIONS ------------------------------------------
 
+def print_details(user_data):
+    print(f"Name: {user_data[0].title()} | ID: {user_data[1]} | Password: {user_data[2]}")
 
 
 
@@ -403,7 +405,9 @@ def patient_display():
 #* ----------------------------------------- DISPATCHERS ------------------------------------------
 
 def admin_mapper(the_user, the_input, the_hospital):
-    print("You Reached Admin Mapper")
+    if the_input == "1":
+        data = the_user.check_details()
+        print_details(data)
 
 def doctor_mapper(the_user, the_input, the_hospital):
     print("You Reached Doctor Mapper")
