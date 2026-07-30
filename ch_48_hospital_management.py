@@ -87,18 +87,22 @@ class Doctor(Person):
 
     def check_ward_patients(self, hospital):
         patients = []
+        ward_name = ""
         for ward in hospital.wards:
-            if ward.supervisor == self.specialist:
+            if ward.supervisor.specialist == self.specialist:
+                ward_name = ward.name
                 for bed in ward.beds:
                     if bed.occupied:
                         patients.append(bed.occupied)
-        return patients
-
+        return patients, ward_name
 
     def reccomend_medicine(self, medicine_name, medicine_list, the_admin, the_patient):
         the_medicine = self.helper_get_medicine(medicine_list, medicine_name, the_admin)
         if the_medicine and the_patient:
             the_patient.billbox.append(the_medicine.cost)
+            the_patient.inbox.append({
+                "medicine recommended to you":the_medicine.name,
+            })
             return True
         else:
             return False
@@ -106,6 +110,9 @@ class Doctor(Person):
     def give_injection(self, the_patient):
         if the_patient:
             the_patient.billbox.append(self.push_injection_cost)
+            the_patient.inbox.append({
+                "injection given by":f"doctor {self.name}",
+            })
             return True
         else:
             return False
@@ -304,8 +311,6 @@ class Hospital:
                 })
                 return False
 
-
-
 sample_doctors = [
     Doctor("Kallol", 11, "ent", 25),
     Doctor("Abhishek", 12, "gastro", 17),
@@ -372,7 +377,6 @@ goodcare.admit_patient(["Gautam", 7], "children")
 goodcare.admit_patient(["Rohan", 8], "children")
 goodcare.admit_patient(["Shouni", 9], "emergency")
 
-
 #* ----------------------------------------- INPUTS ------------------------------------------
 
 def get_id():
@@ -389,6 +393,9 @@ def get_name():
 
 def get_speciality():
     return input("Enter Speciality: ")
+
+def get_patient():
+    return input("Enter Patient's ID: ")
 
 def get_bill():
     try:
@@ -422,11 +429,16 @@ def get_how_many():
         invalid_input()
         return None
 
+def want_to_add_supervisor():
+    return input("Want to add Supervisor? Y / N\n").lower()
 
+def get_ward_name():
+    return input("Enter Ward Name: ")
 
+def get_doctor_name():
+    return input("Enter Doctor Name: ")
 
 #* ----------------------------------------- DISPLAYS ------------------------------------------
-
 
 def display_welcome_board(user):
     print(f"Welcome {user.name} | Status: {user.status.title()}")
@@ -541,6 +553,44 @@ def display_bill_status(consent):
 def display_return_amount(return_amount):
     print(f"Here is your return amount, INR {return_amount} /-")
 
+def display_choose_one_patient():
+    print("Choose One Patient from Above")
+
+def display_available_meds(the_hospital):
+    print("Available Medicines")
+    for med in the_hospital.meds:
+        print(med.name)
+
+def display_med_recommend_status(consent, medicine_name, patient_name):
+    if consent:
+        print(f"{medicine_name} Recommended to {patient_name}")
+    else:
+        print("Medicine is not available as of now.")
+
+def display_injection_status(consent, doc, patient):
+    if consent:
+        print(f"An Injection was given by Doctor {doc} to {patient}")
+    else:
+        print("Injection Push Unsuccessful.")
+
+def check_ward_details(hospital):
+    the_decision = False
+    all_have_supervisor = True
+    for ward in hospital.wards:
+        if not ward.supervisor:
+            print(f"Ward Name: {ward.name} | Supervisor: Not Assigned")
+            all_have_supervisor = False
+            the_decision = True
+    if all_have_supervisor:
+        print("All Wards have Supervisor.")
+    return the_decision
+
+def display_supervisor_addition_status(consent, ward, doctor):
+    if consent:
+        print(f"Doctor {doctor.name} has been assigned to Ward {ward.name} as a Supervisor.")
+    else:
+        print("Supervisor Addition Failed")
+
 def display_logged_out():
     print("logged Out")
 
@@ -571,8 +621,9 @@ def doctor_display():
 0. Exit
 ''')
 
-def doctor_display_2():
-    print('''
+def doctor_display_2(the_patient):
+    print(f'''
+Patient Name: {the_patient.name}
 1. Recommend Medicine
 2. Give Injection
 0. Back
@@ -582,9 +633,44 @@ def patient_display():
     print('''
 1. Check Details
 2. Check Inbox
-3. Pay Bill
+3. Check Bill
+4. Pay Bill
 0. Exit
 ''')
+
+#* ----------------------------------------- DOC DISPLAY - 2 ------------------------------------------
+
+def check_patients(patients_list, data, hospital, user):
+    if patients_list:
+        print(f"Available Patients | {data}")
+        for patient in patients_list:
+            print(f"Name: {patient.name} | ID: {patient.id}")
+        display_choose_one_patient()
+        patient_id = get_patient()
+        for patient in patients_list:
+            if patient.id == patient_id:
+                while True:
+                    doctor_display_2(patient)
+                    input = get_input()
+                    if input == "0":
+                        break
+                    elif input == "1":
+                        display_available_meds(hospital)
+                        med_name = get_name()
+                        if user.reccomend_medicine(med_name, hospital.meds, hospital.admin, patient):
+                            display_med_recommend_status(1, med_name, patient.name)
+                        else:
+                            display_med_recommend_status(0, med_name, patient.name)
+                    elif input == "2":
+                        if user.give_injection(patient):
+                            display_injection_status(1, user.name, patient.name)
+                        else:
+                            display_injection_status(0, user.name, patient.name)
+                    else:
+                        invalid_input()
+        invalid_input()
+    else:
+        print("No Patient available right now.")
 
 #* ----------------------------------------- DISPATCHERS ------------------------------------------
 
@@ -667,12 +753,43 @@ def admin_mapper(the_user, the_input, the_hospital):
             display_discharge_status(1, the_patient_name)
         else:
             display_discharge_status(0, the_patient_name)
+    elif the_input == "10":
+        if check_ward_details(the_hospital):
+            user_consent = want_to_add_supervisor()
+            if user_consent == "y":
+                name_of_ward = get_ward_name()
+                the_ward = the_hospital.helper_get_ward(name_of_ward.lower())
+                if the_ward:
+                    display_all_doctors(the_hospital)
+                    doc_name = get_doctor_name()
+                    the_doctor = the_hospital.helper_get_doctor(doc_name.title())
+                    if the_doctor:
+                        if the_ward.add_supervisor(the_doctor):
+                            display_supervisor_addition_status(1, the_ward, the_doctor)
+                        else:
+                            display_supervisor_addition_status(0, the_ward, the_doctor)
+                    else:
+                        invalid_input()
+                else:
+                    invalid_input()
     else:
         invalid_input()
 
-
 def doctor_mapper(the_user, the_input, the_hospital):
-    print("You Reached Doctor Mapper")
+    if the_input == "1":
+        data = the_user.check_details()
+        print_details(data)
+    elif the_input == "2":
+        inbox = the_user.check_inbox()
+        print_inbox(inbox)
+    elif the_input == "3":
+        assigned_patients = the_user.check_assigned_patients()
+        check_patients(assigned_patients, "Assigned to You", the_hospital, the_user)
+    elif the_input == "4":
+        ward_patients, name_of_ward = the_user.check_ward_patients(the_hospital)
+        check_patients(ward_patients, f"Inside Ward: {name_of_ward.title()}", the_hospital, the_user)
+    else:
+        invalid_input()
 
 def patient_mapper(the_user, the_input, the_hospital):
     if the_input == "1":
@@ -684,9 +801,11 @@ def patient_mapper(the_user, the_input, the_hospital):
     elif the_input == "3":
         final_bill = the_user.check_bill()
         print_final_bill(final_bill)
+    elif the_input == "4":
+        total_bill = the_user.check_bill()
         bill_amount = get_bill()
         if bill_amount:
-            done_or_not, amount = the_user.pay_bill(final_bill, bill_amount)
+            done_or_not, amount = the_user.pay_bill(total_bill, bill_amount)
             if done_or_not:
                 display_bill_status(1)
                 if amount:
