@@ -23,9 +23,6 @@ class Match:
                 return player
         return None
 
-    def helper_match_ends(self):
-        print("Match Complete")
-
     def helper_player_out(self):
         if len(self.players_on_pitch) > 1:
             random_player = random.choice(self.players_on_pitch)
@@ -35,8 +32,6 @@ class Match:
             self.out_players.append(random_player)
             return random_player
         else:
-            self.match_summery()
-            self.helper_match_ends()
             return None
 
     def add_player_on_pitch(self, player_name):
@@ -52,11 +47,23 @@ class Match:
         else:
             return None, None
 
-    def reset_match(self, score_board):
+    def reset_match(self, the_scoreboard):
+        the_scoreboard.score = 0
         self.players_on_pitch.clear()
         self.out_players.clear()
-        score_board.score = 0
+        for player in self.all_players_list:
+            player.score = 0
+            player.is_out = False
+            player.on_pitch = False
+        self.helper_add_first_two_players_on_pitch()
         return True
 
-    def match_summery(self):
-        print("Here is your match summery")
+    def match_summery(self, total_score):
+        no_of_out_players = len(self.out_players)
+        match_summery_data = {
+            "player_data":self.all_players_list,
+            "total_score":total_score,
+            "out_player_number":no_of_out_players,
+        }
+        return match_summery_data
+        

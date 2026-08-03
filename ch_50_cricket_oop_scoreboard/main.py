@@ -33,7 +33,7 @@ while match_is_on:
                     runs_to_add = user_input.get_runs()
                     if runs_to_add:
                         the_player.add_run(runs_to_add)
-                        scoreboard.helper_add_score(match.all_players_list)
+                        scoreboard.helper_add_score(runs_to_add)
                         display.single_player_runs(the_player)
                     else:
                         display.invalid_input()
@@ -57,12 +57,15 @@ while match_is_on:
             if highest_scorer_player:
                 display.highest_scorer_display(highest_scorer_player)
             else:
-                display.invalid_input()
+                display.match_has_started()
         elif user_consent == "5":
-            ...
+            match.reset_match(scoreboard)
+            display.match_reset_done()
         elif user_consent == "6":
-            ...
+            the_sorted_list = scoreboard.sort_scoreboard(match.all_players_list)
+            display.show_sorted_list(the_sorted_list)
         elif user_consent == "7":
-            ...
+            summery_data = match.match_summery(scoreboard.score)
+            display.summery_display(summery_data)
     else:
         display.invalid_input()

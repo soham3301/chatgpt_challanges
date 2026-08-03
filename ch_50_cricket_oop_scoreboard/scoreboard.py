@@ -4,9 +4,8 @@ class Scoreboard:
         self.name = "Scoreboard"
         self.score = 0
 
-    def helper_add_score(self, player_list):
-        for player in player_list:
-            self.score += player.score
+    def helper_add_score(self, received_score):
+        self.score += received_score
 
     def show_scoreboard(self, on_pitch_list, out_list):
         received_players = []
@@ -30,4 +29,12 @@ class Scoreboard:
         return the_player
 
     def sort_scoreboard(self, player_list):
-        print("Scoreboard Sorted")
+        sorted_list = player_list.copy()
+        n = len(sorted_list)
+        for i in range(n):
+            minimum_index = i
+            for j in range(i + 1, n):
+                if sorted_list[j].score > sorted_list[minimum_index].score:
+                    minimum_index = j
+            sorted_list[i], sorted_list[minimum_index] = sorted_list[minimum_index], sorted_list[i]
+        return sorted_list

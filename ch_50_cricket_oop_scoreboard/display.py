@@ -47,3 +47,36 @@ class Display:
 
     def highest_scorer_display(self, the_player):
         print(f"Highest Scorer: {the_player.name} | Score is: {the_player.score}")
+
+    def match_has_started(self):
+        print("The match has started now. No run is made till now.")
+
+    def match_reset_done(self):
+        print("Match has been Reset.")
+
+    def show_sorted_list(self, sorted_list):
+        for player in sorted_list:
+            if player.is_out or player.on_pitch:
+                if player.is_out:
+                    print(f"{player.name} | {player.score}")
+                else:
+                    print(f"{player.name} | {player.score}*")
+
+    def summery_display(self, data):
+        print("Here is your Match Summery")
+        total_score = 0
+        out_player_number = 0
+        for key, value in data.items():
+            if key == "player_data":
+                for player in value:
+                    if player.on_pitch:
+                        print(f"{player.name} | {player.score}*")
+                    else:
+                        print(f"{player.name} | {player.score}")
+            elif key == "total_score":
+                total_score = value
+            elif key == "out_player_number":
+                out_player_number = value
+        print(f"Total Score: {total_score} / {out_player_number}")
+            
+            
