@@ -8,6 +8,6 @@ class UserInput:
 
     def take_number_input(self):
         try:
-            return  int(input(": "))
+            return  round(int(input(": ")))
         except ValueError:
             return None

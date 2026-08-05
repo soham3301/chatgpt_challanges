@@ -20,7 +20,6 @@ class Drink:
             self.ingredients[ingredient_list[index]] = self.quantities[index]
             self.find_making_cost()
             self.set_selling_cost()
-        print(f"Making Cost: {self.making_cost} | Selling Cost: {self.selling_cost}")
 
     def check_profit_loss(self):
         return self.selling_cost, self.making_cost
