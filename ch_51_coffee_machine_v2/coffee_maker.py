@@ -1,7 +1,7 @@
 
 class CoffeeMaker:
     def __init__(self):
-        self.storage = {}
+        self.stock = {}
         self.store_limits = {
             "water":150,
             "coffee":30,
@@ -12,8 +12,8 @@ class CoffeeMaker:
     def add_ingredient(self, the_ingredient_list):
         for ingredient in the_ingredient_list:
             limit = self.store_limits[ingredient.name]
-            self.storage[ingredient] = limit
-        return self.storage
+            self.stock[ingredient] = limit
+        return self.stock
 
     def add_available_drinks(self, drink_list):
         for drink in drink_list:
@@ -25,7 +25,7 @@ class CoffeeMaker:
     def storage_checker(self, drink_name, drink_number):
         storage_limit_exceeds = False
         for ingredient, ingredient_quantity in self.saved_drinks[drink_name].ingredients.items():
-            if self.store_limits[ingredient.name] >= ingredient_quantity * drink_number:
+            if self.stock[ingredient] >= ingredient_quantity * drink_number:
                 continue
             else:
                 storage_limit_exceeds = True
@@ -33,4 +33,18 @@ class CoffeeMaker:
 
     def storage_reducer(self, the_drink, number_of_that_drink):
         for ingredient in the_drink.ingredients:
-            self.storage[ingredient] -= the_drink.ingredients[ingredient] * number_of_that_drink
+            self.stock[ingredient] -= round(the_drink.ingredients[ingredient] * number_of_that_drink)
+
+    def stock_cleaner_and_add_ingredients(self, ingredient_list):
+        self.stock.clear()
+        return self.add_ingredient(ingredient_list)
+
+
+    def check_spent_stock(self):
+        amount_to_refill = 0
+        stock_spent = {}
+        for ingredient in self.stock:
+            if self.store_limits[ingredient.name] - self.stock[ingredient]:
+                stock_spent[ingredient] = self.store_limits[ingredient.name] - self.stock[ingredient]
+                amount_to_refill += ingredient.cost_checker(self.store_limits[ingredient.name] - self.stock[ingredient])
+        return stock_spent, amount_to_refill

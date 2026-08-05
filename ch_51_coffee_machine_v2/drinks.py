@@ -18,8 +18,8 @@ class Drink:
     def add_ingredient(self, ingredient_list):
         for index in range(len(ingredient_list)):
             self.ingredients[ingredient_list[index]] = self.quantities[index]
-            self.find_making_cost()
-            self.set_selling_cost()
+        self.find_making_cost()
+        self.set_selling_cost()
 
     def check_profit_loss(self):
         return self.selling_cost, self.making_cost

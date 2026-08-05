@@ -44,5 +44,5 @@ class MoneyMachine:
     def add_earning(self, bill):
         self.earning += bill
 
-
-    
+    def add_spending(self, amount):
+        self.spending += amount

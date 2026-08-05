@@ -52,7 +52,19 @@ while machine_running:
                     elif user_command == "2":
                         display.check_money_spent(money_machine.spending)
                     elif user_command == "3":
-                        display.check_storage(coffee_maker.storage)
+                        display.check_storage(coffee_maker.stock)
+                    elif user_command == "4":
+                        stock_spent_till_now, amount_needed_to_refill = coffee_maker.check_spent_stock()
+                        display.spent_stock_details(stock_spent_till_now, amount_needed_to_refill)
+                        consent_of_user = user_input.take_text_input()
+                        if consent_of_user == "y":
+                            coffee_maker.stock_cleaner_and_add_ingredients(ingredient_list)
+                            money_machine.add_spending(amount_needed_to_refill)
+                            display.stock_filled_up()
+                    elif user_command == "5":
+                        new_storage = coffee_maker.stock_cleaner_and_add_ingredients(ingredient_list)
+                        money_machine.cost_to_fill_up_storage(new_storage)
+                        display.stock_filled_up()
                 else:
                     display.invalid_input()
             else:

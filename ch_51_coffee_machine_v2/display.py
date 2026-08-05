@@ -58,7 +58,7 @@ class Display:
 2. Check money spent till now.
 3. Check storage.
 4. Add ingredients in existing stock.
-5. Clear stock and fillup ingredients.
+5. Clear old stock and fillup ingredients.
 ''')
 
     def check_money_earned(self, amount):
@@ -70,6 +70,15 @@ class Display:
     def check_storage(self, the_storage):
         for ingredient, storage in the_storage.items():
             print(f"Ingredient: {ingredient.name} | Available Unit: {storage}")
+
+    def spent_stock_details(self, stock_list, the_amount):
+        for ingredient, units in stock_list.items():
+            print(f"Ingredient: {ingredient.name} | Need to fill up: {units} Units")
+        print(f"Amount needed to fill this up: {the_amount} INR")
+        print(f"Type 'Y' to spent {the_amount} INR and fill up the stock")
+
+    def stock_filled_up(self):
+        print("Stock Filled Up Again")
 
     def admin_log_out(self):
         print("Logged Out from Admin Panel")
