@@ -1,0 +1,22 @@
+Standard Non Ac,201,1250,"","",""
+Standard Non Ac,202,1250,"","",""
+Standard Non Ac,203,1250,"","",""
+Standard Non Ac,204,1250,"","",""
+Standard Ac,211,1250,True,"",""
+Standard Ac,212,1250,True,"",""
+Standard Ac,214,1250,True,"",""
+Standard Non Ac with Breakfast,101,1680,"",True,""
+Standard Non Ac with Breakfast,102,1680,"",True,""
+Standard Non Ac with Breakfast,103,1680,"",True,""
+Standard Non Ac with Breakfast,104,1680,"",True,""
+Standard Ac with Breakfast,111,1900,True,True,""
+Standard Ac with Breakfast,112,1900,True,True,""
+Standard Ac with Breakfast,114,1900,True,True,""
+Deluxe Ac with Breakfast,321,2400,True,True,""
+Deluxe Ac with Breakfast,322,2400,True,True,""
+Deluxe Ac with Breakfast,323,2400,True,True,""
+"Deluxe Ac with Breakfast, Lanch and Dinner",301,2900,True,True,True
+"Deluxe Ac with Breakfast, Lanch and Dinner",302,2900,True,True,True
+"Executive Ac with Breakfast, Lanch and Dinner",401,3800,True,True,True
+"Executive Ac with Breakfast, Lanch and Dinner",402,3800,True,True,True
+"Presedential Suite Ac with Breakfast, Lanch and Dinner",505,5000,True,True,True
