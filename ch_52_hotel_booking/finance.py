@@ -1,7 +1,7 @@
 
 class Cashbox:
-    def __init__(self):
-        self.earning = 0
+    def __init__(self, amount):
+        self.earning = amount
 
     def receive_amount(self, amount):
         self.earning += amount
