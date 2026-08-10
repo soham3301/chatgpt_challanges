@@ -5,9 +5,7 @@ from room import Room
 from guest import Guest
 from finance import Cashbox
 
-# with open("./data_csv/room.csv", mode="w") as file:
-#     writter = csv.writer(file)
-#     writter.writerows(room_list)
+#? NOTE:- This hotel.py became a God Object. Creating a Recorder class for handling csv data is needed.
 
 class Hotel:
     def __init__(self):
@@ -21,12 +19,12 @@ class Hotel:
         with open("./data_csv/room.csv") as room_file:
             render_room = csv.reader(room_file)
             for room_row in render_room:
-                self.rooms[room_row[1]] = Room(room_row[0], int(room_row[1]), int(room_row[2]), bool(room_row[3]), bool(room_row[4]), bool(room_row[5]), room_row[6])
+                self.rooms[room_row[1]] = Room(room_row[0], int(room_row[1]), int(room_row[2]), room_row[3].lower() == "true", room_row[4].lower() == "true", room_row[5].lower() == "true", room_row[6])
         self.guests = {}
         with open("./data_csv/guest.csv") as guest_file:
             render_guest = csv.reader(guest_file)
             for guest_row in render_guest:
-                self.guests[guest_row[3]] = Guest(guest_row[0], guest_row[1], guest_row[2], guest_row[3])
+                self.guests[guest_row[3]] = Guest(guest_row[0], int(guest_row[1]), int(guest_row[2]), guest_row[3])
         with open("./data_csv/cash.csv") as cash_file:
             render_cash = csv.reader(cash_file)
             for cash_row in render_cash:
@@ -38,6 +36,17 @@ class Hotel:
         with open("./data_csv/guest.csv", mode="w") as clear_file:
             pass
 
+    def clear_ordered_food_data(self, room_number):
+        remaining_order_rows = []
+        with open("./data_csv/ordered_food.csv") as food_order_file:
+            render_order = csv.reader(food_order_file)
+            for row in render_order:
+                if row and row[0] != str(room_number):
+                    remaining_order_rows.append(row)
+        with open("./data_csv/ordered_food.csv", mode="w") as order_file:
+            order_writer = csv.writer(order_file)
+            order_writer.writerows(remaining_order_rows)
+
     def write_food_data(self):
         with open("./data_csv/food.csv", mode="w") as food_file:
             food_writer = csv.writer(food_file)
@@ -46,11 +55,36 @@ class Hotel:
                     [food_object.name, food_object.price, food_object.quantity]
                 ])
 
+    def write_food_order(self, the_order):
+        with open("./data_csv/ordered_food.csv", mode="a") as ordered_food_file:
+            order_writer = csv.writer(ordered_food_file)
+            for room_no, order_list in the_order.items():
+                for order in order_list:
+                    order_writer.writerows([
+                        [room_no, order["name"], order["quantity"], order["price"]]
+                    ])
+
+    def fetch_food_order_from_csv(self, room_number):
+        list_of_recorded_order = []
+        with open("./data_csv/ordered_food.csv") as fetch_order_file:
+            render_order = csv.reader(fetch_order_file)
+            for order_row in render_order:
+                if order_row[0] == str(room_number):
+                    list_of_recorded_order.append([order_row[1], order_row[2], order_row[3]])
+        return list_of_recorded_order
+
     def write_guest_data(self, the_guest):
         with open("./data_csv/guest.csv", mode="a") as file:
             writer = csv.writer(file)
             writer.writerows([
                 [the_guest.name, str(the_guest.birth_year), str(the_guest.choosen_room_number), str(the_guest.key)],
+            ])
+
+    def write_guest_data_for_record_keeping(self, the_guest):
+        with open("./data_csv/guest_record.csv", mode="a") as guest_record_file:
+            guest_writer = csv.writer(guest_record_file)
+            guest_writer.writerows([
+                [the_guest.name, str(the_guest.birth_year), str(the_guest.choosen_room_number)]
             ])
 
     def write_cash_data(self):
@@ -104,18 +138,17 @@ class Hotel:
                 return self.rooms[room_no]
         return None
 
-    def check_booking(self, amount, room):
-        if amount > room.price:
-            return True, amount - room.price
-        elif amount == room.price:
-            return True, None
-        else:
-            return False, amount
-
     def complete_booking(self, the_guest_name, the_guest_birth_year, room):
         self.generate_guest(the_guest_name, the_guest_birth_year, room.number, room.key)
         room.book_room(self.guests[room.key])
         self.cash_box.receive_amount(room.price)
+
+    def initiate_checkout(self, room):
+        the_guest = self.guests.pop(room.key)
+        self.write_guest_data_for_record_keeping(the_guest)
+        self.clear_ordered_food_data(room.number)
+        self.cash_box.receive_amount(room.bill)
+        room.leave_room()
 
     def send_available_foods(self):
         available_food_info = {}

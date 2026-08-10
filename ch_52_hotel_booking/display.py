@@ -32,6 +32,9 @@ class Display:
     def ask_guest_birth_year(self):
         print("Enter Your Birth Year")
 
+    def confirm_payment(self, amount):
+        print(f"You are about to pay INR {amount}/-. Type 'Y' for confirm | 'N' for cancel")
+
     def not_adult(self):
         print("You can't book a room as a Minor")
 
@@ -39,20 +42,10 @@ class Display:
         print(f"Here is your refund amount: INR {refund}/-")
 
     def booking_complete(self, key):
-        print(f"Your Booking is complete. Here is your key: {key} | You can login now using this key.")
+        print(f"Your Booking is complete. Here is your key: {key} | You can enter room using this key.")
 
     def booking_incomplete(self, refund_amount):
         print(f"Your Booking is incomplete. Here is your full refund: INR {refund_amount}/-")
-    
-
-
-
-
-
-
-
-
-
 
     def ask_room_key(self):
         print("Enter your room key")
@@ -60,8 +53,8 @@ class Display:
     def invalid_key_entered(self):
         print("Invalid Key Entered")
 
-    def welcome_into_room(self):
-        print("Welcome in the room. Enjoy Your Stay")
+    def welcome_into_room(self, guest_name):
+        print(f"Welcome {guest_name}. Enjoy Your Stay")
 
     def show_facilities(self, data):
         if data["ac"]:
@@ -97,8 +90,13 @@ class Display:
     def food_not_exist(self, food_name):
         print(f"Sorry we don't have {food_name} as of now.")
 
-    def show_bill(self, data):
-        print(f"Paid amount: INR {data["paid"]}/- | Remaining amount: INR {data["unpaid"]}/-")
+    def show_bill(self, bill_data, order_data, total_bill, food_bill):
+        for order in order_data:
+            print(f"{order} = INR {order_data[order]}/-")
+        print(f"Total Food Bill = INR {food_bill}/-")
+        print(f"Amount Paid during Booking = INR {bill_data["paid"]}/-")
+        print(f"Your Total Bill is = INR {total_bill}/-")
+        print(f"\nRemaining Amount = INR {bill_data["unpaid"]}/-")
 
     def room_lock_notification(self):
         print("Room Locked.")
@@ -107,31 +105,35 @@ class Display:
         print('''
 1. Check Facilities
 2. Order Food
-3. Check Bill
-4. Checkout
-5. Exit Room
+3. Check Total Bill
+4. Clear Remaining Bill
+5. Checkout
+6. Exit Room
 ''')
 
+    def clear_bill_display(self, bill):
+        print(f"Your remaining bill is: INR {bill}/- | You can pay any amount.")
 
+    def bill_cleared(self, received_amount, remaining_bill):
+        print(f"You have cleared bill: INR {received_amount}/- | Bill remains for clearing: INR {remaining_bill}")
 
+    def bill_payment_incomplete(self, bill):
+        print(f"Bill Payment Incomplete | Here is your money: INR {bill}/-")
 
+    def checkout_payment_display(self, bill):
+        print(f"To Checkout, Pay your remaining bill: INR {bill}/-")
 
+    def checkout_incomplete(self, refund):
+        print(f"Checkout Incomplete | Here is your money: INR {refund}/-")
 
-
-
-
-
-
-
+    def checkout_complete(self):
+        print("Hope we served you well.")
 
     def room_not_exist(self):
         print("This room doesn't exist")
-
 
     def thank_you_display(self):
         print("Thanks for using Hotel Booking")
 
     def invalid_input(self):
         print("Invalid Input")
-
-
