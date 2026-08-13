@@ -91,3 +91,30 @@ class Output:
 
     def password_updated(self, url, username, password):
         print(f"Your new password: {password} for username: {username} has been updated - Link: {url}")
+
+    def search_by_what(self):
+        print('''
+1. Search by Username
+2. Search by URL
+0. Back
+''')
+
+    def show_result(self, text, opposite_text, search_choice, result_data):
+        #? NOTE:- I should avoid such calculations on output display | A display should only output data, not calculate
+        print(f"You have {len(result_data)} Credentials saved for this {text}: {search_choice}")
+        for data_dict in result_data:
+            for the_key, password in data_dict.items():
+                print(f"{opposite_text}: {the_key} | Password: {password}")
+
+    def want_to_delete(self, url, username, password):
+        print(f'''
+Want to DELETE this credential?
+{url} > Username: {username}, Password: {password}
+\nType 'Y' for Delete | Type 'N' for Cancellation
+''')
+
+    def delete_complete(self):
+        print("Credential Deleted")
+
+    def delete_cancelled(self):
+        print("Deletation Cancelled")

@@ -70,7 +70,6 @@ class PasswordManager:
     def save_credentials(self):
         self.recorder.write_cred_data(self.saved_credentials)
 
-
     def generate_password(self):
         new_password = self.generator.generate_password(self.recorder.saved_data)
         return new_password
@@ -97,18 +96,46 @@ class PasswordManager:
         else:
             return False
 
-    def validate_password(self, url, username, password):
+    def is_password_different(self, url, username, password):
         #* This code runs after url validation and username validation
         if password == self.saved_credentials[url][username].password:
-            print(password)
-            print(self.saved_credentials[url][username].password)
             return False
         else:
             return True
+
+    def get_cred(self, url, username):
+        #* This code runs after confirming credential exist
+        return self.saved_credentials[url][username]
 
     def update_password(self, url, username, new_password):
         self.saved_credentials[url][username].password = new_password
         self.save_credentials()
         self.load_credentials()
 
-        
+    def search_by_username(self, the_username):
+        result_data = []
+        for url, data_dict in self.saved_credentials.items():
+            for username, cred_object in data_dict.items():
+                if username == the_username:
+                    result_data.append({
+                        url: cred_object.password
+                    })
+        return result_data
+
+    def search_by_url(self, url):
+        result_data = []
+        if url in self.saved_credentials:
+            for username, cred_object in self.saved_credentials[url].items():
+                result_data.append({
+                    username: cred_object.password
+                })
+        return result_data
+
+    def delete_credential(self, url, username):
+        #* This code runs after all the necessary validations
+        if len(self.saved_credentials[url]) > 1:
+            del self.saved_credentials[url][username]
+        else:
+            del self.saved_credentials[url]
+        self.save_credentials()
+

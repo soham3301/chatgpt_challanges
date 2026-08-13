@@ -96,7 +96,7 @@ while manager_running:
                                     output.password_rules()
                                     output.enter_password()
                                     password_updt = user_input.text_input()
-                                    if manager.validate_password(url_updt, username_updt, password_updt):
+                                    if manager.is_password_different(url_updt, username_updt, password_updt):
                                         if manager.password_condition_chekcer(password_updt):
                                             output.confirm_password()
                                             confirmed_password_updt = user_input.text_input()
@@ -114,9 +114,48 @@ while manager_running:
                         else:
                             output.entry_not_exist(url_updt, "URL")
                     elif primary_input == "3":
-                        print("Search Password Section")
+                        while True:
+                            output.search_by_what()
+                            search_choice = user_input.text_input()
+                            if search_choice == "0":
+                                break
+                            elif search_choice == "1":
+                                output.enter_username()
+                                username_srch = user_input.text_input()
+                                search_result_by_username = manager.search_by_username(username_srch)
+                                if search_result_by_username:
+                                    output.show_result("Username", "URL", username_srch, search_result_by_username)
+                                else:
+                                    output.entry_not_exist(username_srch, "Username")
+                            elif search_choice == "2":
+                                output.enter_url()
+                                url_srch = user_input.text_input()
+                                search_result_by_url = manager.search_by_url(url_srch)
+                                if search_result_by_url:
+                                    output.show_result("URL", "Username", url_srch, search_result_by_url)
+                                else:
+                                    output.entry_not_exist(url_srch, "URL")
+                            else:
+                                output.invalid_entry()
                     elif primary_input == "4":
-                        print("Delete Password Section")
+                        output.enter_url()
+                        url_del = user_input.text_input()
+                        if manager.validate_url(url_del):
+                            output.enter_username()
+                            username_del = user_input.text_input()
+                            if manager.validate_username(url_del, username_del):
+                                cred_for_delete = manager.get_cred(url_del, username_del)
+                                output.want_to_delete(cred_for_delete.website, cred_for_delete.username, cred_for_delete.password)
+                                delete_consent = user_input.text_input()
+                                if delete_consent.lower() == "y":
+                                    manager.delete_credential(url_del, username_del)
+                                    output.delete_complete()
+                                else:
+                                    output.delete_cancelled()
+                            else:
+                                output.entry_not_exist(username_del, "Username")
+                        else:
+                            output.entry_not_exist(url_del, "URL")
                     else:
                         output.invalid_entry()
                 else:
