@@ -1,24 +1,8 @@
 
 import random
 import csv
+import json
 from encryption import Encryption
-
-#? credential saving format
-# saved_creds_format = {
-#     "website_name":{
-#         "one_username":{
-#             "random_key":"Credential_Object",
-#         },
-#         "another_username":{
-#             "random_key":"Credential_Object",
-#         },
-#     },
-#     "another_website_name":{
-#         "one_username":{
-#             "random_key":"Credential_Object",
-#         },
-#     },
-# }
 
 class Recorder:
     def __init__(self):
@@ -45,7 +29,7 @@ class Recorder:
 
     def generate_key(self):
         #! IMPORTANT:- value of key should be below 10. Otherwise IndexError comes from numbers.csv - Need to fix this part
-        key = random.randint(0, 10)
+        key = random.randint(1, 10)
         return key
 
     def write_admin_password(self, new_password):
@@ -63,6 +47,42 @@ class Recorder:
             for row in render_admin_pass:
                 decrypted = self.security.decrypt(row[1], self.saved_data, int(row[0]))
             return decrypted
-                
 
-rec = Recorder()
+    def write_cred_data(self, data):
+        formatted_data = {}
+        for url, user_cred in data.items():
+            for username, cred in user_cred.items():
+                key = self.generate_key()
+                #! IMPORTANT:- The key should not be saved in same file with data - Need to fix it.
+                en_url = self.security.encrypt(cred.website, self.saved_data, key)
+                en_username = self.security.encrypt(cred.username, self.saved_data, key)
+                en_password = self.security.encrypt(cred.password, self.saved_data, key)
+                if en_url in formatted_data:
+                    formatted_data[en_url][en_username] = [en_password, key]
+                else:
+                    formatted_data[en_url] = {
+                        en_username: [en_password, key]
+                    }
+        with open("./data/credentials.json", mode="w") as cred_file_w:
+            json.dump(formatted_data, cred_file_w, indent=4)
+
+    def load_cred_data(self):
+        try:
+            loaded_data = {}
+            with open("./data/credentials.json", mode="r") as cred_file_r:
+                data = json.load(cred_file_r)
+                for url, cred in data.items():
+                    for username, password in cred.items():
+                        key = password[1]
+                        de_url = self.security.decrypt(url, self.saved_data, key)
+                        de_username = self.security.decrypt(username, self.saved_data, key)
+                        de_password = self.security.decrypt(password[0], self.saved_data, key)
+                        if de_url in loaded_data:
+                            loaded_data[de_url][de_username] = de_password
+                        else:
+                            loaded_data[de_url] = {
+                                de_username: de_password
+                            }
+        except json.JSONDecodeError:
+            loaded_data = {}
+        return loaded_data

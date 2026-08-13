@@ -10,7 +10,7 @@ class PasswordManager:
         self.saved_credentials = {}
         self.load_credentials()
 
-    def condition_chekcer(self, received_pass):
+    def password_condition_chekcer(self, received_pass):
         small_l = 0
         cap_l = 0
         num = 0
@@ -32,20 +32,44 @@ class PasswordManager:
         else:
             return False
 
+    def username_validation(self, the_url, the_username):
+        if the_url in self.saved_credentials:
+            if the_username in self.saved_credentials[the_url]:
+                return False
+            else:
+                return True
+        else:
+            return True
+
+    def generate_credential(self, the_url, the_username, the_confirmed_password):
+        if the_url in self.saved_credentials:
+            self.saved_credentials[the_url][the_username] = Credential(the_url, the_username, the_confirmed_password)
+        else:
+            self.saved_credentials[the_url] = {
+                    the_username: Credential(the_url, the_username, the_confirmed_password)
+                }
+        self.save_credentials()
+
     def get_generated_password(self, strength):
         generated_password = self.generator.generate_password(self.recorder.saved_data, strength)
         return generated_password
 
     def load_credentials(self):
-        #* Generate Credential Object using that data
-        #* Load the data into saved_credentials
-        pass
+        loaded_data = self.recorder.load_cred_data()
+        if loaded_data:
+            for url, cred in loaded_data.items():
+                for username, password in cred.items():
+                    if url in self.saved_credentials:
+                        self.saved_credentials[url][username] = Credential(url, username, password)
+                    else:
+                        self.saved_credentials[url] = {
+                            username: Credential(url, username, password)
+                        }
+        print(self.saved_credentials)
 
     def save_credentials(self):
-        self.recorder.write_credentials(self.saved_credentials)
+        self.recorder.write_cred_data(self.saved_credentials)
 
-    def save_new_credential(self, cred):
-        pass
 
     def generate_password(self):
         new_password = self.generator.generate_password(self.recorder.saved_data)
@@ -59,4 +83,32 @@ class PasswordManager:
 
     def save_admin_password(self, received_new_password):
         self.recorder.write_admin_password(received_new_password)
+
+    def validate_url(self, url):
+        if url in self.saved_credentials:
+            return True
+        else:
+            return False
+
+    def validate_username(self, url, username):
+        #* This code runs after url validation
+        if username in self.saved_credentials[url]:
+            return True
+        else:
+            return False
+
+    def validate_password(self, url, username, password):
+        #* This code runs after url validation and username validation
+        if password == self.saved_credentials[url][username].password:
+            print(password)
+            print(self.saved_credentials[url][username].password)
+            return False
+        else:
+            return True
+
+    def update_password(self, url, username, new_password):
+        self.saved_credentials[url][username].password = new_password
+        self.save_credentials()
+        self.load_credentials()
+
         

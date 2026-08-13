@@ -57,6 +57,14 @@ class Output:
 1. Easy Password
 2. Medium Password
 3. Strong Password
+0. Back
+''')
+
+    def password_keeper(self, password):
+        print(f'''
+1. Set this generated password: {password}
+2. Try Another One
+0. Back
 ''')
 
 
@@ -66,5 +74,20 @@ class Output:
     def invalid_entry(self):
         print("That's an invalid entry")
 
-    def short_password(self):
+    def password_breaks_rules(self):
         print("Your Password deos not follow Criteria")
+
+    def credentials_saved(self, the_username, the_password, the_url):
+        print(f"Your Password: {the_password} for Username: {the_username} has been saved - Link: {the_url}")
+
+    def username_already_exist(self, username):
+        print(f"This username: '{username}' already exist")
+
+    def entry_not_exist(self, entry, text):
+        print(f"This {text}: {entry}, doesn't exist in Password Manager")
+
+    def current_password_error(self, password):
+        print(f"This is your current password: {password} | Can't set the same password again.")
+
+    def password_updated(self, url, username, password):
+        print(f"Your new password: {password} for username: {username} has been updated - Link: {url}")
