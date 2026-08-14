@@ -65,7 +65,6 @@ class PasswordManager:
                         self.saved_credentials[url] = {
                             username: Credential(url, username, password)
                         }
-        print(self.saved_credentials)
 
     def save_credentials(self):
         self.recorder.write_cred_data(self.saved_credentials)
