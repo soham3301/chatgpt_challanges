@@ -3,37 +3,16 @@ import random
 from transaction import Transaction
 
 class Account:
-    def __init__(self, balance):
-        #! AC No should be random
+    def __init__(self, cust_id):
         self.number = None
-        self.balance = balance
+        self.balance = 0
         self.is_locked = False
-        self.attached_customer_id = None
+        self.attached_customer_id = cust_id
         self.transaction_number = 0
         self.transaction_history = {}
 
-    def transaction_recorder(self, amount, the_type, *args):
-        self.transaction_number += 1
-        if args:
-            transfer_transaction = Transaction(amount, the_type)
-            transfer_transaction.generate_tran_id()
-            if args[0] == "received":
-                transfer_transaction.transfer_account_number(args[1], self.number)
-                self.transaction_history[self.transaction_number] = {
-                    args[0]: transfer_transaction
-                }
-            else:
-                transfer_transaction.transfer_account_number(self.number, args[1])
-                self.transaction_history[self.transaction_number] = {
-                    args[1]: transfer_transaction
-                }
-        else:
-            cash_transaction = Transaction(amount, the_type)
-            cash_transaction.generate_tran_id()
-            self.transaction_history[self.transaction_number] = {
-                the_type: cash_transaction
-            }
-
+    def generate_ac_no(self):
+        self.number = random.randint(1000000, 9999999)
 
     def deposit(self, amount):
         if amount > 0:
@@ -75,4 +54,26 @@ class Account:
 
     def check_transaction_history(self):
         pass
+
+    def transaction_recorder(self, amount, the_type, *args):
+        self.transaction_number += 1
+        if args:
+            transfer_transaction = Transaction(amount, the_type)
+            transfer_transaction.generate_tran_id()
+            if args[0] == "received":
+                transfer_transaction.transfer_account_number(args[1], self.number)
+                self.transaction_history[self.transaction_number] = {
+                    args[0]: transfer_transaction
+                }
+            else:
+                transfer_transaction.transfer_account_number(self.number, args[1])
+                self.transaction_history[self.transaction_number] = {
+                    args[1]: transfer_transaction
+                }
+        else:
+            cash_transaction = Transaction(amount, the_type)
+            cash_transaction.generate_tran_id()
+            self.transaction_history[self.transaction_number] = {
+                the_type: cash_transaction
+            }
 

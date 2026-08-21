@@ -14,4 +14,4 @@ class Transaction:
         self.to_account_no = to_ac_no
 
     def generate_tran_id(self):
-        self.tran_id = random.randint(10000, 100000)
+        self.tran_id = random.randint(10000, 99999)
