@@ -3,12 +3,15 @@
 
 from customer import Customer
 from account import Account
+from recorder import Recorder
 
 class Bank:
     def __init__(self):
-        self.accounts = {}
-        self.customers = {}
+        self.accounts = {}                          #*  {ac_no: ac_object}
+        self.customers = {}                         #*  {cust_id: cust_object}
         self.email_mobile_set = set()
+        self.recorder = Recorder()
+        self.load_data()
 
     def add_account(self, the_account):
         self.accounts[the_account.number] = the_account
@@ -31,8 +34,8 @@ class Bank:
         self.email_mobile_set.add(new_customer.mobile)
         return new_customer
 
-    def create_account(self, first_deposit_amount, customer_id):
-        new_account = Account(first_deposit_amount, customer_id)
+    def create_account(self, customer_id):
+        new_account = Account(customer_id)
         new_account.generate_ac_no()
         self.add_account(new_account)
         return new_account
@@ -71,3 +74,18 @@ class Bank:
             return True
         else:
             return False
+
+    def save_data(self):
+        self.recorder.write_customer_data(self.customers)
+        self.recorder.write_account_data(self.accounts)
+        self.recorder.write_email_mobile_set(self.email_mobile_set)
+
+    def load_data(self):
+        loaded_customer_data = self.recorder.load_customer_data()
+        if loaded_customer_data:
+            for customer_id, customer_details in loaded_customer_data.items():
+                new_customer = Customer(customer_details["name"], int(customer_details["age"]), customer_details["email"], int(customer_details["mobile"]))
+                new_customer.load_customer_ac_id_pass(customer_details["account_number"], customer_details["cust_id"], customer_details["password"])
+                self.add_customer(new_customer)
+        else:
+            self.customers = {}

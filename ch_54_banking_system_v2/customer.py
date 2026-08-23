@@ -7,7 +7,7 @@ class Customer:
         self.age = age
         self.email = email_id
         self.mobile = mobile_number
-        self.account = None
+        self.account_number = None
         self.cust_id = None
         self.password = None
 
@@ -28,11 +28,16 @@ class Customer:
         pass_number = random.randint(1000, 9999)
         self.password = self.name + str(pass_number)
 
-    def attach_account(self, the_account):
-        self.account = the_account
+    def attach_account_number(self, the_account):
+        self.account_number = the_account.number
 
     def change_password(self, new_password):
         self.password = new_password
 
     def display_customer_information(self):
         pass
+
+    def load_customer_ac_id_pass(self, ac_no, cust_id, cust_password):
+        self.account_number = ac_no
+        self.cust_id = cust_id
+        self.password = cust_password

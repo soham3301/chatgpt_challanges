@@ -8,8 +8,7 @@ class Account:
         self.balance = 0
         self.is_locked = False
         self.attached_customer_id = cust_id
-        self.transaction_number = 0
-        self.transaction_history = {}
+        self.transaction_history = {}                       #*  {tran_id: tran_object}
 
     def generate_ac_no(self):
         self.number = random.randint(1000000, 9999999)
@@ -17,7 +16,6 @@ class Account:
     def deposit(self, amount):
         if amount > 0:
             self.balance += amount
-            self.transaction_recorder(amount, "deposit")
             return True
         else:
             return False
@@ -26,25 +24,41 @@ class Account:
         if amount > 0:
             if self.balance >= amount:
                 self.balance -= amount
-                self.transaction_recorder(self.send_amount, "withdraw")
                 return True
             else:
                 return False
         else:
             return False
 
-    def receive_amount(self, amount, from_account):
+    def cash_deposit(self, amount):
+        if self.deposit(amount):
+            transaction = self.generate_cash_transaction(amount, "deposit")
+            self.record_transaction(transaction)
+            return True
+        else:
+            return False
+
+    def cash_withdraw(self, amount):
+        if self.withdraw(amount):
+            transaction = self.generate_cash_transaction(amount, "withdraw")
+            self.record_transaction(transaction)
+        else:
+            return False
+
+    def receive_amount(self, amount, the_transaction):
         if self.deposit(amount=amount):
-            self.transaction_recorder(amount, "transfer", "received", from_account)
+            self.record_transaction(the_transaction)
             return True
         else:
             return False
 
     def send_amount(self, amount, to_account):
-        if self.withdraw(amount):
-            self.transaction_recorder(amount, "transfer", "sent", to_account)
+        if self.withdraw(amount=amount):
+            transaction = self.generate_transfer_transaction(amount, self.number, to_account)
+            self.record_transaction(transaction)
+            return transaction
         else:
-            return False
+            return None
 
     def check_balance(self):
         return self.balance
@@ -55,25 +69,20 @@ class Account:
     def check_transaction_history(self):
         pass
 
-    def transaction_recorder(self, amount, the_type, *args):
-        self.transaction_number += 1
-        if args:
-            transfer_transaction = Transaction(amount, the_type)
-            transfer_transaction.generate_tran_id()
-            if args[0] == "received":
-                transfer_transaction.transfer_account_number(args[1], self.number)
-                self.transaction_history[self.transaction_number] = {
-                    args[0]: transfer_transaction
-                }
-            else:
-                transfer_transaction.transfer_account_number(self.number, args[1])
-                self.transaction_history[self.transaction_number] = {
-                    args[1]: transfer_transaction
-                }
-        else:
-            cash_transaction = Transaction(amount, the_type)
-            cash_transaction.generate_tran_id()
-            self.transaction_history[self.transaction_number] = {
-                the_type: cash_transaction
-            }
+    def generate_cash_transaction(self, amount, transaction_type):
+        the_transaction = Transaction()
+        the_transaction.generate_tran_id()
+        the_transaction.amount_and_type_setter(amount, transaction_type)
+        return the_transaction
+
+    def generate_transfer_transaction(self, amount, from_account_number, to_account_number):
+        the_transaction = Transaction()
+        the_transaction.generate_tran_id()
+        the_transaction.amount_and_type_setter(amount, "transfer")
+        the_transaction.transfer_account_number(from_account_number, to_account_number)
+        return the_transaction
+
+    def record_transaction(self, the_transaction_object):
+        self.transaction_history[the_transaction_object.tran_id] = the_transaction_object
+
 
