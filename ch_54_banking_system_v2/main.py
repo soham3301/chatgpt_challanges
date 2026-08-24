@@ -111,9 +111,62 @@ def command_deposit(ac):
                 the_display.deposit_successfull(amount)
                 my_bank.save_data()
             else:
-                the_display.deposit_unsuccessfull()
+                the_display.transaction_unsuccessfull("deposit")
         else:
             the_display.transaction_cancelled()
+    else:
+        the_display.invalid_input()
+
+def command_withdraw(ac):
+    the_display.enter_amount()
+    amount = user_input.number_input()
+    if amount:
+        if ac.is_balance_sufficient(amount):
+            the_display.comfirm_amount(amount, "withdraw")
+            wit_confirmation = user_input.text_input().lower()
+            if wit_confirmation == "y":
+                if ac.cash_withdraw(amount):
+                    the_display.withdraw_successfull(amount)
+                    my_bank.save_data()
+                else:
+                    the_display.transaction_unsuccessfull("withdraw")
+            else:
+                the_display.transaction_cancelled()
+        else:
+            the_display.insufficient_balance()
+    else:
+        the_display.invalid_input()
+
+def command_transfer(ac):
+    the_display.enter_amount()
+    amount = user_input.number_input()
+    if amount:
+        if ac.is_balance_sufficient(amount):
+            the_display.comfirm_amount(amount, "transfer")
+            tran_confirmation = user_input.text_input().lower()
+            if tran_confirmation == "y":
+                the_display.enter_recepients_account_number()
+                ac_no = user_input.number_input()
+                if ac_no:
+                    to_account = my_bank.get_account(ac_no)
+                    if to_account:
+                        transaction_object = ac.send_amount(amount, to_account.number)
+                        if transaction_object:
+                            if to_account.receive_amount(amount, transaction_object):
+                                the_display.transaction_successfull(amount, to_account.number)
+                                my_bank.save_data()
+                            else:
+                                the_display.transaction_unsuccessfull("transfer")
+                        else:
+                            the_display.transaction_unsuccessfull("transfer")
+                    else:
+                        the_display.account_not_exist(ac_no)
+                else:
+                    the_display.invalid_input()
+            else:
+                the_display.transaction_cancelled()
+        else:
+            the_display.insufficient_balance()
     else:
         the_display.invalid_input()
 
@@ -121,14 +174,43 @@ def command_check_balance(ac):
     balance = ac.check_balance()
     the_display.show_balance(balance)
 
+def command_tran_history(ac):
+    print("Transaction History Will be Available Soon")
+
+def command_change_pass(cust):
+    the_display.enter_old_password()
+    old_pass = user_input.text_input()
+    if old_pass:
+        if cust.validate_password(old_pass):
+            the_display.enter_new_password()
+            new_pass = user_input.text_input()
+            if new_pass:
+                the_display.confirm_password()
+                new_pass_again = user_input.text_input()
+                if new_pass_again:
+                    if new_pass == new_pass_again:
+                        cust.change_password(new_pass_again)
+                        the_display.pass_changed()
+                        my_bank.save_data()
+                    else:
+                        the_display.password_doesnot_match()
+                else:
+                    the_display.invalid_input()
+            else:
+                the_display.invalid_input()
+        else:
+            the_display.incorrect_password()
+    else:
+        the_display.invalid_input()
+
 def command_mapper(the_user_input, customer, account):
     saved_commands = {
         "1": command_deposit,
-        "2": ...,
-        "3": ...,
+        "2": command_withdraw,
+        "3": command_transfer,
         "4": command_check_balance,
-        "5": ...,
-        "6": ...,
+        "5": command_tran_history,
+        "6": command_change_pass,
         "7": ...,
         "8": ...,
         "9": ...

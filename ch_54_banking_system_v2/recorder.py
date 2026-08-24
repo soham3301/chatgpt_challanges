@@ -1,7 +1,7 @@
 
 import json
 
-#! WARNING:- Data should not be saved as plain text. This is OOP Practice, hence avoiding encryption for now.
+#! WARNING:- Data should not be saved as plain text. This is OOP Practice, hence avoiding encryption for now. Big Security Bug
 
 class Recorder:
     def __init__(self):

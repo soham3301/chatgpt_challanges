@@ -54,6 +54,7 @@ class Display:
         print("Your first deposit should not be less than Rs: 500/-")
 
     def ac_open_successfull(self, cust_id, cust_pass):
+        #? Note:- The system should send the id and pass to the customer's email id. Security Bug
         print(f'''
 === Your Account Open is succesfull ===
 Here are your credentials
@@ -64,6 +65,8 @@ Use them for login
     
     def ac_open_failed(self):
         print("Your Account Open Failed")
+
+#?  ==================== BEFORE LOGIN DISPLAYS =======================
 
     def enter_customer_id(self):
         print("Enter Customer ID")
@@ -88,7 +91,7 @@ Use them for login
 2. Withdraw
 3. Transfer
 4. Check Balance
-5. Transaction History
+5. Show Transaction History
 6. Change Password
 7. Show Account Details
 8. Show Customer Details
@@ -108,8 +111,37 @@ Use them for login
     def deposit_successfull(self, amount):
         print(f"Your deposit of Rs:- {amount}/- has been successfull")
 
-    def deposit_unsuccessfull(self):
-        print("The deposit was unsuccessfull")
+    def withdraw_successfull(self, amount):
+        print(f"Your withdraw of Rs:- {amount} has been successfull")
+
+    def enter_recepients_account_number(self):
+        print("Enter Recepients Account Number")
+
+    def transaction_successfull(self, amount, to_number):
+        print(f"Rs:- {amount} has been sent from your account to {to_number}")
+
+    def account_not_exist(self, to_ac):
+        print(f"This Account bearing Number {to_ac} does not exist")
+
+    def insufficient_balance(self):
+        print("Insufficient Balance. Transaction Cancelled")
+
+    def enter_old_password(self):
+        print("Enter Your Old Password")
+
+    def enter_new_password(self):
+        print("Enter New Password")
+
+    def confirm_password(self):
+        print("Enter the same Password again")
+
+    def password_doesnot_match(self):
+        print("Password doesn't match.")
+
+    def pass_changed(self):
+        print("Your Password has successfully changed")
+
+
 
 
 
@@ -121,6 +153,9 @@ Use them for login
 
     def comfirm_amount(self, amount, tran_type):
         print(f"You are about to {tran_type} Rs:- {amount}/-. To Confirm type 'Y'.")
+
+    def transaction_unsuccessfull(self, tran_type):
+        print(f"The {tran_type} was unsuccessfull")
 
     def transaction_cancelled(self):
         print("The Transaction has been cancelled.")

@@ -51,23 +51,28 @@ class Account:
         if self.withdraw(amount):
             transaction = self.generate_cash_transaction(amount, "withdraw")
             self.record_transaction(transaction)
+            return True
         else:
             return False
 
     def receive_amount(self, amount, the_transaction):
         if self.deposit(amount=amount):
-            self.record_transaction(the_transaction)
+            self.record_transaction(the_transaction)        #? Both account keeps a record of the same transaction. Not a good looking solution.
             return True
         else:
             return False
 
-    def send_amount(self, amount, to_account):
+    def send_amount(self, amount, to_account_no):
         if self.withdraw(amount=amount):
-            transaction = self.generate_transfer_transaction(amount, self.number, to_account)
+            transaction = self.generate_transfer_transaction(amount, self.number, to_account_no)
             self.record_transaction(transaction)
             return transaction
         else:
             return None
+
+    def is_balance_sufficient(self, bal):
+        return self.balance >= bal
+            
 
     def check_balance(self):
         return self.balance

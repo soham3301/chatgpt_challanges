@@ -1,6 +1,8 @@
 
 import random
 
+#! Important:- Strong Password Rules has not been set. it's a big diversion from challenge goal. Hence, ignoring it for this challenge. However, it's a bug
+
 class Customer:
     def __init__(self, name, age, email_id, mobile_number):
         self.name = name
@@ -30,6 +32,9 @@ class Customer:
 
     def attach_account_number(self, the_account):
         self.account_number = the_account.number
+
+    def validate_password(self, received_pass):
+        return self.password == received_pass
 
     def change_password(self, new_password):
         self.password = new_password
