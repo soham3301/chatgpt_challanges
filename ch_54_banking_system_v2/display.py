@@ -12,6 +12,8 @@ class Display:
 0. Exit
 ''')
 
+#?  ==================== CREATE ACCOUNT DISPLAYS =======================
+
     def account_creation_rules(self):
         print('''
 1. Age should be greater than 18
@@ -62,6 +64,21 @@ Use them for login
     
     def ac_open_failed(self):
         print("Your Account Open Failed")
+
+#?  ==================== AFTER LOGIN DISPLAYS =======================
+
+
+
+
+
+
+
+
+
+
+
+
+#?  ==================== GENERIC DISPLAYS =======================
 
     def invalid_input(self):
         print("Invalid Input")

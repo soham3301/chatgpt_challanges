@@ -21,3 +21,12 @@ class Transaction:
     def amount_and_type_setter(self, the_amount, the_type):
         self.amount = the_amount
         self.transaction_type = the_type
+
+    def load_tran_data(self, t_id, amount, tran_type, from_ac, to_ac):
+        self.tran_id = t_id
+        self.amount = amount
+        self.transaction_type = tran_type
+        if from_ac:
+            self.from_account_no = int(from_ac)
+        if to_ac:
+            self.to_account_no = int(to_ac)

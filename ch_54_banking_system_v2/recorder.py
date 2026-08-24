@@ -1,6 +1,8 @@
 
 import json
 
+#! WARNING:- Data should not be saved as plain text. This is OOP Practice, hence avoiding encryption for now.
+
 class Recorder:
     def __init__(self):
         self.name = "Recorder"
@@ -48,7 +50,30 @@ class Recorder:
                 unique_file.write(f"{str(item)}\n")
 
     def load_account_data(self):
-        pass
+        try:
+            loaded_data = {}
+            with open("./data/accounts.json") as account_loaded_file:
+                data = json.load(account_loaded_file)
+                for account_number, account_details in data.items():
+                    loaded_data[account_number] = {
+                        "number": account_details["number"],
+                        "balance": account_details["balance"],
+                        "is_locked": account_details["is_locked"] == "true",
+                        "attached_customer_id": account_details["attached_customer_id"]
+                    }
+                    for tran_id, tran_details in account_details["transaction_history"].items():
+                        loaded_data[account_number]["transaction_history"] = {
+                            tran_id: {
+                                "tran_id": tran_details["tran_id"],
+                                "amount": tran_details["amount"],
+                                "from_account_no": tran_details["from_account_no"],
+                                "to_account_no": tran_details["to_account_no"],
+                                "transaction_type": tran_details["transaction_type"]
+                            }
+                        }
+        except json.JSONDecodeError:
+            loaded_data = {}
+        return loaded_data
 
     def load_customer_data(self):
         try:
@@ -70,4 +95,13 @@ class Recorder:
         return loaded_data
 
     def load_email_mobile_set(self):
-        pass
+        data_set = set()
+        with open("./data/unique_set.txt") as unique_loaded_file:
+            for line in unique_loaded_file:
+                data_set.add(line.strip())
+        return data_set
+        
+
+# test_rec = Recorder()
+
+# test_rec.load_email_mobile_set()

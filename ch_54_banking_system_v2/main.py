@@ -9,9 +9,6 @@ the_display = Display()
 
 #* Testing Ground
 
-print(my_bank.customers)
-#! NEXT TASK:- Load data from json files
-
 #* Testing Ground End
 
 def create_account():
@@ -38,6 +35,7 @@ def create_account():
                                 customer.attach_account_number(account)
                                 return customer.cust_id, customer.password
                             else:
+                                the_display.deposit_amount_problem()
                                 return None, None
                         else:
                             the_display.mobile_format_problem()
@@ -74,34 +72,8 @@ while bank_open:
         the_display.account_creation_rules()
         c_id, c_pass = create_account()
         if c_id and c_pass:
+            my_bank.save_data()
             the_display.ac_open_successfull(c_id, c_pass)
-            print("==============ACCOUNT DETAILS================")
-            for ac_no, the_ac in my_bank.accounts.items():
-                print(f"KEY -> Account Number: {ac_no}")
-                print(f"Number: {the_ac.number}")
-                print(f"Balance: {the_ac.balance}")
-                print(f"Is Locked: {the_ac.is_locked}")
-                print(f"Attached Customer ID: {the_ac.attached_customer_id}")
-                print(f"Transaction History: {the_ac.transaction_history}")
-                print("===============TRANSACTION DETAILS===============")
-                for transac_id, transac_object in the_ac.transaction_history.items():
-                    print(f"KEY -> Transaction ID: {transac_id}")
-                    print(f"Transaction_ID: {transac_object.tran_id}")
-                    print(f"Transaction Amount: {transac_object.amount}")
-                    print(f"From Account: {transac_object.from_account_no}")
-                    print(f"To Account: {transac_object.to_account_no}")
-                    print(f"Transaction Type: {transac_object.transaction_type}")
-            print("===============CUSTOMER DETAILS===============")
-            for cust_id, customer in my_bank.customers.items():
-                print(f"KEY -> Customer ID: {cust_id}")
-                print(f"Name: {customer.name}")
-                print(f"Age: {customer.age}")
-                print(f"email: {customer.email}")
-                print(f"Mobile: {customer.mobile}")
-                print(f"Account Number: {customer.account_number}")
-                print(f"Customer ID: {customer.cust_id}")
-                print(f"Password: {customer.password}")
-            # my_bank.save_data()
         else:
             the_display.ac_open_failed()
     elif first_user_input == "manager": #? Special Privilages

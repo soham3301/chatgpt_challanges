@@ -31,7 +31,7 @@ class Bank:
         new_customer.generate_customer_id_and_password()
         self.add_customer(new_customer)
         self.email_mobile_set.add(new_customer.email)
-        self.email_mobile_set.add(new_customer.mobile)
+        self.email_mobile_set.add(str(new_customer.mobile))
         return new_customer
 
     def create_account(self, customer_id):
@@ -84,8 +84,21 @@ class Bank:
         loaded_customer_data = self.recorder.load_customer_data()
         if loaded_customer_data:
             for customer_id, customer_details in loaded_customer_data.items():
-                new_customer = Customer(customer_details["name"], int(customer_details["age"]), customer_details["email"], int(customer_details["mobile"]))
-                new_customer.load_customer_ac_id_pass(customer_details["account_number"], customer_details["cust_id"], customer_details["password"])
-                self.add_customer(new_customer)
+                loaded_customer = Customer(customer_details["name"], int(customer_details["age"]), customer_details["email"], int(customer_details["mobile"]))
+                loaded_customer.load_customer_ac_id_pass(int(customer_details["account_number"]), customer_details["cust_id"], customer_details["password"])
+                self.add_customer(loaded_customer)
         else:
             self.customers = {}
+        loaded_account_data = self.recorder.load_account_data()
+        if loaded_account_data:
+            for ac_no, ac_details in loaded_account_data.items():
+                loaded_account = Account(ac_details["attached_customer_id"])
+                loaded_account.load_recorded_details(int(ac_details["number"]), int(ac_details["balance"]), ac_details["is_locked"], ac_details["transaction_history"])
+                self.add_account(loaded_account)
+        else:
+            self.accounts = {}
+        loaded_email_mobile_data = self.recorder.load_email_mobile_set()
+        if loaded_email_mobile_data:
+            self.email_mobile_set = loaded_email_mobile_data
+        else:
+            self.email_mobile_set = set()

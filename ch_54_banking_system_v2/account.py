@@ -13,6 +13,15 @@ class Account:
     def generate_ac_no(self):
         self.number = random.randint(1000000, 9999999)
 
+    def load_recorded_details(self, no, bal, locked, tran_history_dict):
+        self.number = no
+        self.balance = bal
+        self.is_locked = locked
+        for transac_id, transac_details in tran_history_dict.items():
+            loaded_transaction = Transaction()
+            loaded_transaction.load_tran_data(int(transac_details["tran_id"]), int(transac_details["amount"]), transac_details["transaction_type"], transac_details["from_account_no"], transac_details["to_account_no"])
+            self.transaction_history[int(transac_details["tran_id"])] = loaded_transaction
+
     def deposit(self, amount):
         if amount > 0:
             self.balance += amount
