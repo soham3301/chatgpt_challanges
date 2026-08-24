@@ -26,6 +26,23 @@ class Bank:
         else:
             return False
 
+    def get_customer(self, customer_id):
+        if customer_id:
+            if customer_id in  self.customers:
+                return self.customers[customer_id]
+            else:
+                return None
+        return None
+
+    def get_account(self, account_number):
+        if account_number:
+            if account_number in self.accounts:
+                return self.accounts[account_number]
+            else:
+                return None
+        else:
+            return None
+
     def create_customer(self, name, age, email_id, mobile_number):
         new_customer = Customer(name, age, email_id, mobile_number)
         new_customer.generate_customer_id_and_password()
@@ -40,9 +57,14 @@ class Bank:
         self.add_account(new_account)
         return new_account
 
+    def lock_account(self, cust_id):
+        the_account = self.get_account(self.get_customer(cust_id).account_number)
+        the_account.is_locked = True
 
-    def lock_account(self):
-        pass
+    def is_account_locked(self, customer_id):
+        the_account = self.get_account(self.get_customer(customer_id).account_number)
+        if the_account:
+            return the_account.is_locked
 
     def unlock_account(self):
         pass
@@ -71,6 +93,12 @@ class Bank:
     @staticmethod
     def validate_mobile(number):
         if number > 0 and len(str(number)) == 10:
+            return True
+        else:
+            return False
+
+    def validate_customer_id(self, the_id):
+        if the_id in self.customers:
             return True
         else:
             return False

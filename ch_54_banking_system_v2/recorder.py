@@ -17,7 +17,16 @@ class Recorder:
                 "attached_customer_id": account_object.attached_customer_id,
             }
             for tran_id, tran_object in account_object.transaction_history.items():
-                formatted_data[account_number]["transaction_history"] = {
+                if "transaction_history" in formatted_data[account_number]:
+                    formatted_data[account_number]["transaction_history"][tran_id] = {
+                        "tran_id": tran_object.tran_id,
+                        "amount": tran_object.amount,
+                        "from_account_no": tran_object.from_account_no,
+                        "to_account_no": tran_object.to_account_no,
+                        "transaction_type": tran_object.transaction_type
+                    }
+                else:
+                    formatted_data[account_number]["transaction_history"] = {
                     tran_id: {
                         "tran_id": tran_object.tran_id,
                         "amount": tran_object.amount,
@@ -58,19 +67,28 @@ class Recorder:
                     loaded_data[account_number] = {
                         "number": account_details["number"],
                         "balance": account_details["balance"],
-                        "is_locked": account_details["is_locked"] == "true",
+                        "is_locked": account_details["is_locked"],
                         "attached_customer_id": account_details["attached_customer_id"]
                     }
                     for tran_id, tran_details in account_details["transaction_history"].items():
-                        loaded_data[account_number]["transaction_history"] = {
-                            tran_id: {
+                        if "transaction_history" in loaded_data[account_number]:
+                            loaded_data[account_number]["transaction_history"][tran_id] = {
                                 "tran_id": tran_details["tran_id"],
                                 "amount": tran_details["amount"],
                                 "from_account_no": tran_details["from_account_no"],
                                 "to_account_no": tran_details["to_account_no"],
                                 "transaction_type": tran_details["transaction_type"]
                             }
-                        }
+                        else:
+                            loaded_data[account_number]["transaction_history"] = {
+                                tran_id: {
+                                    "tran_id": tran_details["tran_id"],
+                                    "amount": tran_details["amount"],
+                                    "from_account_no": tran_details["from_account_no"],
+                                    "to_account_no": tran_details["to_account_no"],
+                                    "transaction_type": tran_details["transaction_type"]
+                                }
+                            }
         except json.JSONDecodeError:
             loaded_data = {}
         return loaded_data

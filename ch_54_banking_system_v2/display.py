@@ -21,7 +21,7 @@ class Display:
 ''')
 
     def enter_name(self):
-        print("Enter Yuor Name: ")
+        print("Enter Your Name: ")
 
     def enter_age(self):
         print("Enter Your Age: ")
@@ -65,12 +65,51 @@ Use them for login
     def ac_open_failed(self):
         print("Your Account Open Failed")
 
+    def enter_customer_id(self):
+        print("Enter Customer ID")
+
+    def id_not_exist(self):
+        print("This Customer ID doesn't exist")
+
+    def enter_password(self, chance):
+        print(f"Enter Password | You have {chance} chances left")
+
+    def login_failed(self):
+        print("Account Login Failed")
+
 #?  ==================== AFTER LOGIN DISPLAYS =======================
 
+    def welcome_screen(self, cust_name, ac_no):
+        print(f"\nWelcome {cust_name} | Account Number: {ac_no}")
 
+    def after_login_activity_screen(self):
+        print('''
+1. Deposit
+2. Withdraw
+3. Transfer
+4. Check Balance
+5. Transaction History
+6. Change Password
+7. Show Account Details
+8. Show Customer Details
+9. Get Loan
+0. Exit
+''')
 
+    def logged_out(self):
+        print("Logged Out")
 
+    def enter_amount(self):
+        print("Enter Amount")
 
+    def show_balance(self, balance):
+        print(f"Your Account Balance is Rs:- {balance}/-")
+
+    def deposit_successfull(self, amount):
+        print(f"Your deposit of Rs:- {amount}/- has been successfull")
+
+    def deposit_unsuccessfull(self):
+        print("The deposit was unsuccessfull")
 
 
 
@@ -79,6 +118,15 @@ Use them for login
 
 
 #?  ==================== GENERIC DISPLAYS =======================
+
+    def comfirm_amount(self, amount, tran_type):
+        print(f"You are about to {tran_type} Rs:- {amount}/-. To Confirm type 'Y'.")
+
+    def transaction_cancelled(self):
+        print("The Transaction has been cancelled.")
+
+    def account_locked(self):
+        print("Your Account is Locked | Contact Manager to Unlock Account")
 
     def invalid_input(self):
         print("Invalid Input")
