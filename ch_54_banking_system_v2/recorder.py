@@ -48,7 +48,8 @@ class Recorder:
                 "mobile": customer_object.mobile,
                 "account_number": customer_object.account_number,
                 "cust_id": customer_object.cust_id,
-                "password": customer_object.password
+                "password": customer_object.password,
+                "loan_account_number": customer_object.loan_account_number
             }
         with open("./data/customers.json", mode="w") as customer_file:
             json.dump(formatted_data, customer_file, indent=4)
@@ -106,7 +107,8 @@ class Recorder:
                         "mobile": customer_details["mobile"],
                         "account_number": customer_details["account_number"],
                         "cust_id": customer_details["cust_id"],
-                        "password": customer_details["password"]
+                        "password": customer_details["password"],
+                        "loan_account_number": customer_details["loan_account_number"]
                     }
         except json.JSONDecodeError:
             loaded_data = {}

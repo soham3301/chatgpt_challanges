@@ -54,7 +54,7 @@ class Display:
         print("Your first deposit should not be less than Rs: 500/-")
 
     def ac_open_successfull(self, cust_id, cust_pass):
-        #? Note:- The system should send the id and pass to the customer's email id. Security Bug
+        #? Note:- The system should send the id and pass to the customer's email id. Not display as plain text. Security Bug
         print(f'''
 === Your Account Open is succesfull ===
 Here are your credentials
@@ -80,6 +80,9 @@ Use them for login
     def login_failed(self):
         print("Account Login Failed")
 
+    def account_locked(self):
+        print("Your Account is Locked | Contact Manager to Unlock Account")
+
 #?  ==================== AFTER LOGIN DISPLAYS =======================
 
     def welcome_screen(self, cust_name, ac_no):
@@ -99,9 +102,6 @@ Use them for login
 10. Repay Loan
 0. Exit
 ''')
-
-    def logged_out(self):
-        print("Logged Out")
 
     def enter_amount(self):
         print("Enter Amount")
@@ -182,15 +182,99 @@ Password: {password}
 ''')
 
 
+#?  ==================== LOAN DISPLAYS =======================
+
+    def loan_application_started(self):
+        print("Your Loan Application has been started | Fill all the inputs carefully.")
+
+    def how_much_loan_you_need(self):
+        print("Please Enter How Much Amount you need as Loan")
+
+    def monthly_income(self):
+        print("Tell us how much do you earn Monthly")
+
+    def not_eligible_for_loan(self):
+        print("Sorry. Currently no Loan offer is available. Try lowering the requested loan amount")
+
+    def show_possible_loans(self, serial_no, loan_amount, repayment_amount, tenure, interest, emi):
+        print(f"Serial No: {serial_no}. Loan Amount:- {loan_amount}/- -- Repayment Amount: {repayment_amount} -- Repay in {tenure} Months -- Monthly EMI: {emi} -- Interest Applied: {interest}%")
+
+    def choose_the_loan_number(self):
+        print("Choose the serial number for apply. eg: 1, 2, 3 etc etc...")
+
+    def apply_loan_confirmation(self, loan_amount, repayment_amount, tenure, interest, emi):
+        print(f'''
+You are about to apply for a loan of Rs: {loan_amount}/-
+The Monthly EMI would be Rs: {emi}/- and the tenure is {tenure} Months.
+Total Repayment Amount would be Rs: {repayment_amount}/- and {interest}% interest is applied
+
+To Confirm this, Type 'Y' for 'YES'
+''')
+
+    def loan_applied_successfully(self):
+        print("Your Loan Application is successfully applied")
+
+    def already_applied(self):
+        print("You have already applied for a loan. Kindly wait before applying again.")
 
 
 
+
+
+
+
+
+
+#?  ==================== MANAGER DISPLAYS =======================
+
+    def enter_managers_password(self):
+        print("Enter Password")
+
+    def managers_screen(self):
+        print('''
+1. Unlock Account
+2. Check Pending Loan Applications
+3. Approve Loan
+4. Reject Loan
+5. Check Loan Status
+6. Close Loan
+7. Check Total Available Accounts
+8. Check Total Available Customers
+0. Exit
+''')
+
+    def show_locked_accounts(self, account_number):
+        print(f"Locked Account Number: {account_number}")
+
+    def enter_account_number(self):
+        print("Enter a Account Number from above")
+
+    def account_unlocked(self, ac_no):
+        print(f"The Account: {ac_no}, has been unlocked successfully")
+
+    def nothing_to_unlock(self):
+        print("No Account is Locked as of now.")
+
+    def no_pending_loan_application(self):
+        print("No pending Loan Application available for now")
+    
+    def pending_applications_screen(self):
+        print("These are the pending loan applications")
+
+    def view_pending_loan_applications(self, c_id, req_amount, emi, repay_amount):
+        print(f"Customer ID: {c_id} | Loan Ammount Requested: {req_amount}/- | Monthly EMI: {emi}/- | Total Repayment Amount: {repay_amount}/-")
 
 
 
 
 
 #?  ==================== GENERIC DISPLAYS =======================
+
+    def logged_out(self):
+        print("Logged Out")
+
+    def loan_application_cancelled(self):
+        print("Your Loan Application Process has been cancelled")
 
     def comfirm_amount(self, amount, tran_type):
         print(f"You are about to {tran_type} Rs:- {amount}/-. To Confirm type 'Y'.")
@@ -200,9 +284,6 @@ Password: {password}
 
     def transaction_cancelled(self):
         print("The Transaction has been cancelled.")
-
-    def account_locked(self):
-        print("Your Account is Locked | Contact Manager to Unlock Account")
 
     def invalid_input(self):
         print("Invalid Input")

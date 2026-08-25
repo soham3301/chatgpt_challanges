@@ -11,6 +11,7 @@ class Account:
         self.transaction_history = {}                       #*  {tran_id: tran_object}
 
     def generate_ac_no(self):
+        #* Note:- All random number generation has a small bug - two numbers could be same.
         self.number = random.randint(1000000, 9999999)
 
     def load_recorded_details(self, no, bal, locked, tran_history_dict):
@@ -77,6 +78,12 @@ class Account:
     def check_balance(self):
         return self.balance
 
+    def account_lock(self):
+        self.is_locked = True
+
+    def account_unlock(self):
+        self.is_locked = False
+
     def calculate_interest(self):
         #* Note:- Interest is calculated on current balance and flat 4% simple interest. However, real bank interest is calculated on every month's average balance, not current balance
         #* Note:- Account Opening Date is missing. It's an important data.
@@ -95,6 +102,7 @@ class Account:
         return account_data
 
     def check_transaction_history(self):
+        #* Transactions should have a remark section. Like emi payment or loan received etc etc. Missed that.
         transaction_list = []
         new_balance = 0
         for transac_id, transac_object in self.transaction_history.items():

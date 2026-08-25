@@ -222,8 +222,50 @@ def command_show_customer_details(cust):
     cust_data = cust.check_customer_details()
     the_display.show_customer_info(cust_data["name"], cust_data["age"], cust_data["email"], cust_data["mobile"], cust_data["account_number"], cust_data["customer_id"], cust_data["password"])
 
-def command_apply_for_loan(cust):
-    print("Loan Application Section")
+def command_apply_for_loan(cust, ac):
+    if not my_bank.manager.is_already_applied(cust.cust_id):
+        the_display.loan_application_started()
+        the_display.how_much_loan_you_need()
+        requested_loan_amount = user_input.number_input()
+        if requested_loan_amount:
+            the_display.monthly_income()
+            entered_monthly_income = user_input.number_input()
+            if entered_monthly_income:
+                possible_loans = my_bank.manager.get_possible_loan_data(cust.cust_id, requested_loan_amount, entered_monthly_income, ac.balance)
+                if len(possible_loans) == 0:
+                    the_display.not_eligible_for_loan()
+                else:
+                    loan_numbers = []
+                    for loan_serial, loan_item in possible_loans.items():
+                        loan_numbers.append(loan_serial)
+                        the_display.show_possible_loans(loan_serial, loan_item["loan_amount"], loan_item["repayment_amount"], loan_item["tanure_in_months"], loan_item["yearly_interest"], loan_item["monthly_emi"])
+                    the_display.choose_the_loan_number()
+                    loan_number = user_input.number_input()
+                    if loan_number:
+                        if loan_number in loan_numbers:
+                            final_loan_data = possible_loans[loan_number]
+                            the_display.apply_loan_confirmation(final_loan_data["loan_amount"], final_loan_data["repayment_amount"], final_loan_data["tanure_in_months"], final_loan_data["yearly_interest"], final_loan_data["monthly_emi"])
+                            loan_confirmation = user_input.text_input().lower()
+                            if loan_confirmation == "y":
+                                my_bank.manager.receive_loan_application(final_loan_data, cust.cust_id)
+                                the_display.loan_applied_successfully()
+                                my_bank.save_data()
+                                #! Task - save / load manager's data
+                                #! Task - save / load loan application
+                                #! Task - save / load issued loan
+                                #! Tank - save / load emi data of customers
+                            else:
+                                the_display.loan_application_cancelled()
+                        else:
+                            the_display.loan_application_cancelled()
+                    else:
+                        the_display.invalid_input()
+            else:
+                the_display.invalid_input()
+        else:
+            the_display.invalid_input()
+    else:
+        the_display.already_applied()
 
 def command_repay_loan(cust):
     print("Loan Repayment Section")
@@ -243,8 +285,52 @@ def command_mapper(the_user_input, customer, account):
     }
     if the_user_input in ["1", "2", "3", "4", "5", "7"]:
         saved_commands[the_user_input](account)
-    else:
+    elif the_user_input in ["6", "8"]:
         saved_commands[the_user_input](customer)
+    else:
+        saved_commands[the_user_input](customer, account)
+
+def manager_unlock_account():
+    locked_list = my_bank.manager.get_locked_account_numbers()
+    if locked_list:
+        for ac_no in locked_list:
+            the_display.show_locked_accounts(ac_no)
+        the_display.enter_account_number()
+        account_number_for_unlock = user_input.number_input()
+        if account_number_for_unlock:
+            if account_number_for_unlock in locked_list:
+                account_for_unlock = my_bank.get_account(account_number_for_unlock)
+                my_bank.manager.unlock_account(account_for_unlock)
+                the_display.account_unlocked(account_for_unlock.number)
+                my_bank.save_data()
+            else:
+                the_display.invalid_input()
+        else:
+            the_display.invalid_input()
+    else:
+        the_display.nothing_to_unlock()
+
+def manager_check_loan_applications():
+    applications_dict = my_bank.manager.show_loan_applications()
+    if applications_dict:
+        the_display.pending_applications_screen()
+        for cust_id, loan_details in applications_dict.items():
+            the_display.view_pending_loan_applications(cust_id, loan_details["loan_amount"], loan_details["monthly_emi"], loan_details["repayment_amount"])
+    else:
+        the_display.no_pending_loan_application()
+
+def manager_mapper(m_choice):
+    saved_managers_commands = {
+        "1": manager_unlock_account,
+        "2": manager_check_loan_applications,
+        "3": ...,
+        "4": ...,
+        "5": ...,
+        "6": ...,
+        "7": ...,
+        "8": ...,
+    }
+    saved_managers_commands[m_choice]()
 
 
 bank_open = True
@@ -280,6 +366,23 @@ while bank_open:
         else:
             the_display.ac_open_failed()
     elif first_user_input == "manager": #? Special Privilages
-        ...
+        the_display.enter_managers_password()
+        m_password = user_input.text_input()
+        if m_password:
+            if my_bank.manager.validate_login(m_password):
+                while True:
+                    the_display.managers_screen()
+                    managers_choice = user_input.text_input()
+                    if managers_choice == "0":
+                        the_display.logged_out()
+                        break
+                    elif managers_choice in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+                        manager_mapper(managers_choice)
+                    else:
+                        the_display.invalid_input()
+            else:
+                the_display.incorrect_password()
+        else:
+            the_display.invalid_input()
     else:
         the_display.invalid_input()

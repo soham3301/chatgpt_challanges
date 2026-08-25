@@ -1,8 +1,10 @@
 
 #? NOTE:- I never used set. I don't know this is an appropriate case or not. Just trying.
+#? Note:- I missed a point here. Bank should have a balance. Loan amount should be disbursed from it. Also customer's deposit / withdraw should change this balance accordingly.
 
 from customer import Customer
 from account import Account
+from manager import Manager
 from recorder import Recorder
 
 class Bank:
@@ -10,6 +12,7 @@ class Bank:
         self.accounts = {}                          #*  {ac_no: ac_object}
         self.customers = {}                         #*  {cust_id: cust_object}
         self.email_mobile_set = set()
+        self.manager = Manager()
         self.recorder = Recorder()
         self.load_data()
 
@@ -59,15 +62,13 @@ class Bank:
 
     def lock_account(self, cust_id):
         the_account = self.get_account(self.get_customer(cust_id).account_number)
-        the_account.is_locked = True
+        the_account.account_lock()
+        self.manager.locked_account_numbers.append(the_account.number)
 
     def is_account_locked(self, customer_id):
         the_account = self.get_account(self.get_customer(customer_id).account_number)
         if the_account:
             return the_account.is_locked
-
-    def unlock_account(self):
-        pass
 
     @staticmethod
     def validate_age(age):
@@ -113,7 +114,7 @@ class Bank:
         if loaded_customer_data:
             for customer_id, customer_details in loaded_customer_data.items():
                 loaded_customer = Customer(customer_details["name"], int(customer_details["age"]), customer_details["email"], int(customer_details["mobile"]))
-                loaded_customer.load_customer_ac_id_pass(int(customer_details["account_number"]), customer_details["cust_id"], customer_details["password"])
+                loaded_customer.load_customer_ac_id_pass(int(customer_details["account_number"]), customer_details["cust_id"], customer_details["password"], customer_details["loan_account_number"])
                 self.add_customer(loaded_customer)
         else:
             self.customers = {}

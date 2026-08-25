@@ -12,6 +12,7 @@ class Customer:
         self.account_number = None
         self.cust_id = None
         self.password = None
+        self.loan_account_number = None
 
     def check_login(self, customer_id, customer_password):
         if customer_id and customer_password:
@@ -39,13 +40,11 @@ class Customer:
     def change_password(self, new_password):
         self.password = new_password
 
-    def display_customer_information(self):
-        pass
-
-    def load_customer_ac_id_pass(self, ac_no, cust_id, cust_password):
+    def load_customer_ac_id_pass(self, ac_no, cust_id, cust_password, loan_ac_no):
         self.account_number = ac_no
         self.cust_id = cust_id
         self.password = cust_password
+        self.loan_account_number = loan_ac_no
 
     def check_customer_details(self):
         customer_data = {
@@ -58,3 +57,6 @@ class Customer:
             "password": self.password
         }
         return customer_data
+
+    def apply_for_loan(self, loan_data, managers_inbox):
+        pass
