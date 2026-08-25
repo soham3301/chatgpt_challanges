@@ -95,7 +95,8 @@ Use them for login
 6. Change Password
 7. Show Account Details
 8. Show Customer Details
-9. Get Loan
+9. Apply for Loan
+10. Repay Loan
 0. Exit
 ''')
 
@@ -140,6 +141,46 @@ Use them for login
 
     def pass_changed(self):
         print("Your Password has successfully changed")
+
+    def show_transactions(self):
+        print("DEPOSIT WITHDRAW SENT RECEIVED FINAL BALANCE | TRAN ID")
+
+    def tran_show_deposits(self, amount, balance, the_id):
+        print(f"+{amount}/- ________ ____ ________ Rs: {balance}/- | {the_id}")
+
+    def tran_show_withdraws(self, amount, balance, the_id):
+        print(f"_______ -{amount}/- ____ ________ Rs: {balance}/- | {the_id}")
+
+    def tran_show_sent(self, amount, balance, the_id, to_ac):
+        print(f"_______ ________ -{amount} ________ Rs: {balance}/- | {the_id} | To Account: {to_ac}")
+
+    def tran_show_received(self, amount, balance, the_id, from_ac):
+        print(f"_______ ________ ____ +{amount} Rs: {balance}/- | {the_id} | From Account: {from_ac}")
+
+    def show_final_balance(self, balance):
+        print(f"Your Final Balance is Rs: {balance}/-")
+
+    def show_ac_info(self, number, balance, int_gained, cust_id, total_trans):
+        print(f'''
+Account Number: {number}
+Account Balance: {balance}/-
+Interest Gained: {int_gained}/-
+Customer ID: {cust_id}
+Total number of Transactions: {total_trans}
+''')
+
+#! NOTE:- Displaying Password in plain text is not secured.
+    def show_customer_info(self, name, age, email, mobile, ac_no, cust_id, password):
+        print(f'''
+Name: {name}
+Age: {age}
+email ID: {email}
+Mobile Number: {mobile}
+Account Number: {ac_no}
+Customer ID: {cust_id}
+Password: {password}
+''')
+
 
 
 

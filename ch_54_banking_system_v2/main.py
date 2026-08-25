@@ -175,7 +175,18 @@ def command_check_balance(ac):
     the_display.show_balance(balance)
 
 def command_tran_history(ac):
-    print("Transaction History Will be Available Soon")
+    the_history, last_bal = ac.check_transaction_history()
+    the_display.show_transactions()
+    for each_transaction in the_history:
+        if each_transaction["type"] == "deposit":
+            the_display.tran_show_deposits(each_transaction["amount"], each_transaction["balance"], each_transaction["tran_id"])
+        elif each_transaction["type"] == "withdraw":
+            the_display.tran_show_withdraws(each_transaction["amount"], each_transaction["balance"], each_transaction["tran_id"])
+        elif each_transaction["type"] == "transfer" and each_transaction["from_account"] == ac.number:
+            the_display.tran_show_sent(each_transaction["amount"], each_transaction["balance"], each_transaction["tran_id"], each_transaction["to_account"])
+        elif each_transaction["type"] == "transfer" and each_transaction["to_account"] == ac.number:
+            the_display.tran_show_received(each_transaction["amount"], each_transaction["balance"], each_transaction["tran_id"], each_transaction["from_account"])
+    the_display.show_final_balance(last_bal)
 
 def command_change_pass(cust):
     the_display.enter_old_password()
@@ -203,6 +214,20 @@ def command_change_pass(cust):
     else:
         the_display.invalid_input()
 
+def command_show_account_details(ac):
+    ac_data = ac.send_account_information()
+    the_display.show_ac_info(ac_data["number"], ac_data["balance"], ac_data["interest_gained"], ac_data["customer_id"], ac_data["total_transactions"])
+
+def command_show_customer_details(cust):
+    cust_data = cust.check_customer_details()
+    the_display.show_customer_info(cust_data["name"], cust_data["age"], cust_data["email"], cust_data["mobile"], cust_data["account_number"], cust_data["customer_id"], cust_data["password"])
+
+def command_apply_for_loan(cust):
+    print("Loan Application Section")
+
+def command_repay_loan(cust):
+    print("Loan Repayment Section")
+
 def command_mapper(the_user_input, customer, account):
     saved_commands = {
         "1": command_deposit,
@@ -211,9 +236,10 @@ def command_mapper(the_user_input, customer, account):
         "4": command_check_balance,
         "5": command_tran_history,
         "6": command_change_pass,
-        "7": ...,
-        "8": ...,
-        "9": ...
+        "7": command_show_account_details,
+        "8": command_show_customer_details,
+        "9": command_apply_for_loan,
+        "10": command_repay_loan,
     }
     if the_user_input in ["1", "2", "3", "4", "5", "7"]:
         saved_commands[the_user_input](account)
@@ -239,7 +265,7 @@ while bank_open:
                     my_bank.save_data()
                     the_display.logged_out()
                     break
-                elif second_user_input in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+                elif second_user_input in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]:
                     command_mapper(second_user_input, the_customer, the_account)
                 else:
                     the_display.invalid_input()

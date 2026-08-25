@@ -77,11 +77,46 @@ class Account:
     def check_balance(self):
         return self.balance
 
-    def display_account_information(self):
-        pass
+    def calculate_interest(self):
+        #* Note:- Interest is calculated on current balance and flat 4% simple interest. However, real bank interest is calculated on every month's average balance, not current balance
+        #* Note:- Account Opening Date is missing. It's an important data.
+        interest = round(self.balance * 4 / 100)
+        return interest
+
+    def send_account_information(self):
+        interest = self.calculate_interest()
+        account_data = {
+            "number": self.number,
+            "balance": self.balance,
+            "interest_gained": interest,
+            "customer_id": self.attached_customer_id,
+            "total_transactions": len(self.transaction_history)
+        }
+        return account_data
 
     def check_transaction_history(self):
-        pass
+        transaction_list = []
+        new_balance = 0
+        for transac_id, transac_object in self.transaction_history.items():
+            if transac_object.transaction_type == "deposit":
+                new_balance += transac_object.amount
+            elif transac_object.transaction_type == "withdraw":
+                new_balance -= transac_object.amount
+            elif transac_object.transaction_type == "transfer" and transac_object.from_account_no == self.number:
+                new_balance -= transac_object.amount
+            elif transac_object.transaction_type == "transfer" and transac_object.to_account_no == self.number:
+                new_balance += transac_object.amount
+            transaction_list.append({
+                "amount": transac_object.amount,
+                "type": transac_object.transaction_type,
+                "tran_id": transac_object.tran_id,
+                "to_account": transac_object.to_account_no,
+                "from_account": transac_object.from_account_no,
+                "balance": new_balance
+            })
+        return transaction_list, new_balance
+
+
 
     def generate_cash_transaction(self, amount, transaction_type):
         the_transaction = Transaction()

@@ -46,3 +46,15 @@ class Customer:
         self.account_number = ac_no
         self.cust_id = cust_id
         self.password = cust_password
+
+    def check_customer_details(self):
+        customer_data = {
+            "name": self.name,
+            "age": self.age,
+            "email": self.email,
+            "mobile": self.mobile,
+            "account_number": self.account_number,
+            "customer_id": self.cust_id,
+            "password": self.password
+        }
+        return customer_data
