@@ -83,7 +83,7 @@ Use them for login
     def account_locked(self):
         print("Your Account is Locked | Contact Manager to Unlock Account")
 
-#?  ==================== AFTER LOGIN DISPLAYS =======================
+#?  ==================== CUSTOMER AFTER LOGIN DISPLAYS =======================
 
     def welcome_screen(self, cust_name, ac_no):
         print(f"\nWelcome {cust_name} | Account Number: {ac_no}")
@@ -99,7 +99,8 @@ Use them for login
 7. Show Account Details
 8. Show Customer Details
 9. Apply for Loan
-10. Repay Loan
+10. Show Loan Status
+11. Repay Loan
 0. Exit
 ''')
 
@@ -143,7 +144,7 @@ Use them for login
         print("Your Password has successfully changed")
 
     def show_transactions(self):
-        print("DEPOSIT WITHDRAW SENT RECEIVED FINAL BALANCE | TRAN ID")
+        print("DEPOSIT WITHDRAW SENT RECEIVED BALANCE | TRAN ID")
 
     def tran_show_deposits(self, amount, balance, the_id):
         print(f"+{amount}/- ________ ____ ________ Rs: {balance}/- | {the_id}")
@@ -170,13 +171,14 @@ Total number of Transactions: {total_trans}
 ''')
 
 #! NOTE:- Displaying Password in plain text is not secured.
-    def show_customer_info(self, name, age, email, mobile, ac_no, cust_id, password):
+    def show_customer_info(self, name, age, email, mobile, ac_no, loan_ac_no, cust_id, password):
         print(f'''
 Name: {name}
 Age: {age}
 email ID: {email}
 Mobile Number: {mobile}
 Account Number: {ac_no}
+Loan Account Number: {loan_ac_no}
 Customer ID: {cust_id}
 Password: {password}
 ''')
@@ -217,6 +219,13 @@ To Confirm this, Type 'Y' for 'YES'
     def already_applied(self):
         print("You have already applied for a loan. Kindly wait before applying again.")
 
+    def no_loan_available(self):
+        print("You don't have any active loan as of now")
+
+    def show_loan_status(self, status):
+        print(status)
+
+
 
 
 
@@ -240,6 +249,7 @@ To Confirm this, Type 'Y' for 'YES'
 6. Close Loan
 7. Check Total Available Accounts
 8. Check Total Available Customers
+9. Change Password
 0. Exit
 ''')
 
@@ -264,6 +274,28 @@ To Confirm this, Type 'Y' for 'YES'
     def view_pending_loan_applications(self, c_id, req_amount, emi, repay_amount):
         print(f"Customer ID: {c_id} | Loan Ammount Requested: {req_amount}/- | Monthly EMI: {emi}/- | Total Repayment Amount: {repay_amount}/-")
 
+    def varify_loan_display(self, name, age, loan_amt, repay_amt, tanure, emi, ac_no, bal, total_trans, income):
+        print(f'''
+Customer Name:                  {name}
+Customer Age:                   {age}
+Customer Account Number:        {ac_no}
+Current Account Balance:        {bal}/-
+Total Transactions Till Now:    {total_trans}
+Requested Loan Amount:          {loan_amt}/-
+EMI:                            {emi}/-
+Monthly Income:                 {income}/-
+Total Repayment Amount:         {repay_amt}/-
+Loan Tanure (in months):        {tanure}
+''')
+
+    def loan_approval_confirmation(self, name, amount):
+        print(f"Type 'Y' to CONFIRM the Rs: {amount}/- loan of {name}")
+
+    def loan_approved(self, number):
+        print(f"The loan has been approved. Loan Account Nunber: {number}")
+
+    def loan_processing_cancelled(self, name):
+        print(f"Loan Application of {name} has been cancelled as of now")
 
 
 

@@ -13,7 +13,6 @@ class Transaction:
         self.from_account_no = from_ac_no
         self.to_account_no = to_ac_no
 
-
     def generate_tran_id(self):
         self.tran_id = random.randint(10000, 99999)
         return self.tran_id
@@ -27,6 +26,6 @@ class Transaction:
         self.amount = amount
         self.transaction_type = tran_type
         if from_ac:
-            self.from_account_no = int(from_ac)
+            self.from_account_no = from_ac
         if to_ac:
-            self.to_account_no = int(to_ac)
+            self.to_account_no = to_ac

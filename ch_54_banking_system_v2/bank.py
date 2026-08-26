@@ -46,6 +46,10 @@ class Bank:
         else:
             return None
 
+    def get_loan(self, loan_ac_no):
+        return self.manager.show_approved_loan(loan_ac_no)
+
+
     def create_customer(self, name, age, email_id, mobile_number):
         new_customer = Customer(name, age, email_id, mobile_number)
         new_customer.generate_customer_id_and_password()
@@ -108,13 +112,14 @@ class Bank:
         self.recorder.write_customer_data(self.customers)
         self.recorder.write_account_data(self.accounts)
         self.recorder.write_email_mobile_set(self.email_mobile_set)
+        self.recorder.write_manager_data(self.manager)
 
     def load_data(self):
         loaded_customer_data = self.recorder.load_customer_data()
         if loaded_customer_data:
             for customer_id, customer_details in loaded_customer_data.items():
                 loaded_customer = Customer(customer_details["name"], int(customer_details["age"]), customer_details["email"], int(customer_details["mobile"]))
-                loaded_customer.load_customer_ac_id_pass(int(customer_details["account_number"]), customer_details["cust_id"], customer_details["password"], customer_details["loan_account_number"])
+                loaded_customer.load_customer_ac_id_pass(customer_details["account_number"], customer_details["cust_id"], customer_details["password"], customer_details["loan_account_number"])
                 self.add_customer(loaded_customer)
         else:
             self.customers = {}
@@ -122,7 +127,7 @@ class Bank:
         if loaded_account_data:
             for ac_no, ac_details in loaded_account_data.items():
                 loaded_account = Account(ac_details["attached_customer_id"])
-                loaded_account.load_recorded_details(int(ac_details["number"]), int(ac_details["balance"]), ac_details["is_locked"], ac_details["transaction_history"])
+                loaded_account.load_recorded_details(ac_details["number"], int(ac_details["balance"]), ac_details["is_locked"], ac_details["transaction_history"])
                 self.add_account(loaded_account)
         else:
             self.accounts = {}
@@ -131,3 +136,5 @@ class Bank:
             self.email_mobile_set = loaded_email_mobile_data
         else:
             self.email_mobile_set = set()
+        loaded_manager_data = self.recorder.load_manager_data()
+        self.manager.load_data(loaded_manager_data["password"], loaded_manager_data["locked_account_numbers"], loaded_manager_data["loan_applications"], loaded_manager_data["approved_loans"])

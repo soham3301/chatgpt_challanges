@@ -2,6 +2,7 @@
 import random
 
 #! Important:- Strong Password Rules has not been set. it's a big diversion from challenge goal. Hence, ignoring it for this challenge. However, it's a bug
+#? Note:- For simplicity purpose, one customer can avail 1 loan at a time. However, in real banks, customers can avail multiple loans altogether.
 
 class Customer:
     def __init__(self, name, age, email_id, mobile_number):
@@ -53,10 +54,28 @@ class Customer:
             "email": self.email,
             "mobile": self.mobile,
             "account_number": self.account_number,
+            "loan_account_number": self.loan_account_number,
             "customer_id": self.cust_id,
             "password": self.password
         }
         return customer_data
 
-    def apply_for_loan(self, loan_data, managers_inbox):
-        pass
+    def send_customer_info_for_manager(self):
+        return {"name": self.name, "age": self.age}
+
+    def issue_loan(self, loan_number):
+        self.loan_account_number = loan_number
+
+    def clear_loan(self):
+        self.loan_account_number = None
+
+    def prepare_loan_data(self, loan_object):
+        #? Note:- I could have used loan_object.attribute instead of __dict__.copy().
+        loan_obj = loan_object.__dict__.copy()
+        data = f'''
+Loan Account Number: {loan_obj["loan_account_number"]}  |       Loan Tenure: {loan_obj["loan_tanure_in_months"]} months     |       jLoan Amount: {loan_obj["loan_amount"]}/-
+Unpaid Amount: {loan_obj["repayment_amount"]}/-         |       Paid Amount: {loan_obj["amount_paid_till_now"]}/-
+EMI: {loan_obj["emi_amount"]}/- per Month
+Paid EMI: {loan_obj["emi_status"]["paid"]} nos          |       Unpaid EMI: {loan_obj["emi_status"]["unpaid"]} nos
+'''
+        return data

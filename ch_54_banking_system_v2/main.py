@@ -8,9 +8,13 @@ user_input = UserInput()
 the_display = Display()
 
 #* Testing Ground
-
+# my_bank.save_data()
+# print(my_bank.manager.approved_loans)
+#! Task - Repay Loan --- point 11
 
 #* Testing Ground End
+
+#* ======================== USER ACCOUNT CREATION ========================
 
 def create_account_flow():
     the_display.enter_name()
@@ -71,6 +75,7 @@ def create_account_flow():
         the_display.invalid_input()
         return None, None
 
+#* ======================== USER LOGIN ========================
 
 def login_flow():
     the_display.enter_customer_id()
@@ -99,6 +104,8 @@ def login_flow():
     else:
         the_display.id_not_exist()
         return None, None
+
+#* ======================== USERS AREA ========================
 
 def command_deposit(ac):
     the_display.enter_amount()
@@ -220,7 +227,7 @@ def command_show_account_details(ac):
 
 def command_show_customer_details(cust):
     cust_data = cust.check_customer_details()
-    the_display.show_customer_info(cust_data["name"], cust_data["age"], cust_data["email"], cust_data["mobile"], cust_data["account_number"], cust_data["customer_id"], cust_data["password"])
+    the_display.show_customer_info(cust_data["name"], cust_data["age"], cust_data["email"], cust_data["mobile"], cust_data["account_number"], cust_data["loan_account_number"], cust_data["customer_id"], cust_data["password"])
 
 def command_apply_for_loan(cust, ac):
     if not my_bank.manager.is_already_applied(cust.cust_id):
@@ -250,10 +257,6 @@ def command_apply_for_loan(cust, ac):
                                 my_bank.manager.receive_loan_application(final_loan_data, cust.cust_id)
                                 the_display.loan_applied_successfully()
                                 my_bank.save_data()
-                                #! Task - save / load manager's data
-                                #! Task - save / load loan application
-                                #! Task - save / load issued loan
-                                #! Tank - save / load emi data of customers
                             else:
                                 the_display.loan_application_cancelled()
                         else:
@@ -267,7 +270,15 @@ def command_apply_for_loan(cust, ac):
     else:
         the_display.already_applied()
 
-def command_repay_loan(cust):
+def command_show_loan_status(cust):
+    if cust.loan_account_number:
+        loan = my_bank.get_loan(cust.loan_account_number)
+        loan_status = cust.prepare_loan_data(loan)
+        the_display.show_loan_status(loan_status)
+    else:
+        the_display.no_loan_available()
+
+def command_repay_loan(cust, ac):
     print("Loan Repayment Section")
 
 def command_mapper(the_user_input, customer, account):
@@ -281,14 +292,17 @@ def command_mapper(the_user_input, customer, account):
         "7": command_show_account_details,
         "8": command_show_customer_details,
         "9": command_apply_for_loan,
-        "10": command_repay_loan,
+        "10": command_show_loan_status,
+        "11": command_repay_loan,
     }
     if the_user_input in ["1", "2", "3", "4", "5", "7"]:
         saved_commands[the_user_input](account)
-    elif the_user_input in ["6", "8"]:
+    elif the_user_input in ["6", "8", "10"]:
         saved_commands[the_user_input](customer)
     else:
         saved_commands[the_user_input](customer, account)
+
+#* ======================== MANAGERS AREA ========================
 
 def manager_unlock_account():
     locked_list = my_bank.manager.get_locked_account_numbers()
@@ -319,19 +333,45 @@ def manager_check_loan_applications():
     else:
         the_display.no_pending_loan_application()
 
+def manager_approve_loan():
+    the_display.enter_customer_id()
+    entered_cust_id = user_input.text_input()
+    if entered_cust_id:
+        if my_bank.manager.is_this_customer_applied(entered_cust_id):
+            the_loan_application = my_bank.manager.show_loan_applications()[entered_cust_id]
+            loan_customer = my_bank.get_customer(entered_cust_id)
+            loan_cust_account = my_bank.get_account(loan_customer.account_number)
+            loan_customer_details = loan_customer.send_customer_info_for_manager()
+            loan_cust_account_details = loan_cust_account.send_account_information()
+            the_display.varify_loan_display(loan_customer_details["name"], loan_customer_details["age"], the_loan_application["loan_amount"], the_loan_application["repayment_amount"], the_loan_application["tanure_in_months"], the_loan_application["monthly_emi"], loan_cust_account_details["number"], loan_cust_account_details["balance"], loan_cust_account_details["total_transactions"], the_loan_application["monthly_income"])
+            the_display.loan_approval_confirmation(loan_customer_details["name"], the_loan_application["loan_amount"])
+            loan_confirmation_consent = user_input.text_input().lower()
+            if loan_confirmation_consent == "y":
+                loan_ac_no = my_bank.manager.approve_loan(the_loan_application, loan_customer, loan_cust_account)
+                the_display.loan_approved(loan_ac_no)
+                my_bank.save_data()
+            else:
+                the_display.loan_processing_cancelled(loan_customer_details["name"])
+        else:
+            the_display.id_not_exist()
+    else:
+        the_display.invalid_input()
+
 def manager_mapper(m_choice):
     saved_managers_commands = {
         "1": manager_unlock_account,
         "2": manager_check_loan_applications,
-        "3": ...,
+        "3": manager_approve_loan,
         "4": ...,
         "5": ...,
         "6": ...,
         "7": ...,
         "8": ...,
+        "9": ...,
     }
     saved_managers_commands[m_choice]()
 
+#* ======================== THE MAIN LOOP ========================
 
 bank_open = True
 while bank_open:
@@ -351,7 +391,7 @@ while bank_open:
                     my_bank.save_data()
                     the_display.logged_out()
                     break
-                elif second_user_input in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]:
+                elif second_user_input in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]:
                     command_mapper(second_user_input, the_customer, the_account)
                 else:
                     the_display.invalid_input()
@@ -376,7 +416,7 @@ while bank_open:
                     if managers_choice == "0":
                         the_display.logged_out()
                         break
-                    elif managers_choice in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+                    elif managers_choice in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
                         manager_mapper(managers_choice)
                     else:
                         the_display.invalid_input()

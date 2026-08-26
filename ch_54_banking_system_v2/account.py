@@ -12,7 +12,7 @@ class Account:
 
     def generate_ac_no(self):
         #* Note:- All random number generation has a small bug - two numbers could be same.
-        self.number = random.randint(1000000, 9999999)
+        self.number = str(random.randint(1000000, 9999999))
 
     def load_recorded_details(self, no, bal, locked, tran_history_dict):
         self.number = no
@@ -102,7 +102,7 @@ class Account:
         return account_data
 
     def check_transaction_history(self):
-        #* Transactions should have a remark section. Like emi payment or loan received etc etc. Missed that.
+        #* Transactions should have a remark section. Like emi payment or loan received etc etc. I wrote the recorder before loan, not going to edit the entire logic now. Missed this remark feature.
         transaction_list = []
         new_balance = 0
         for transac_id, transac_object in self.transaction_history.items():

@@ -59,6 +59,21 @@ class Recorder:
             for item in the_set:
                 unique_file.write(f"{str(item)}\n")
 
+    def write_manager_data(self, the_manager):
+        with open("./data/manager.json", mode="w") as manager_file:
+            formatted_data = {
+                "password": the_manager.password,
+                "locked_account_numbers": the_manager.locked_account_numbers,
+                "loan_applications": the_manager.loan_applications,
+                "approved_loans": {}
+            }
+            if len(the_manager.approved_loans) > 0:
+                for cust_id, loan_object in the_manager.approved_loans.items():
+                    loan_dict = loan_object.__dict__.copy()
+                    formatted_data["approved_loans"][cust_id] = loan_dict
+            json.dump(formatted_data, manager_file, indent=4)
+
+
     def load_account_data(self):
         try:
             loaded_data = {}
@@ -120,8 +135,21 @@ class Recorder:
             for line in unique_loaded_file:
                 data_set.add(line.strip())
         return data_set
-        
 
-# test_rec = Recorder()
-
-# test_rec.load_email_mobile_set()
+    def load_manager_data(self):
+        try:
+            loaded_data = {}
+            with open("./data/manager.json") as manager_loaded_file:
+                data = json.load(manager_loaded_file)
+                loaded_data["password"] = data["password"]
+                loaded_data["locked_account_numbers"] = data["locked_account_numbers"]
+                loaded_data["loan_applications"] = data["loan_applications"]
+                loaded_data["approved_loans"] = data["approved_loans"]
+        except json.JSONDecodeError:
+            loaded_data = {
+                "password": "12345",
+                "locked_account_numbers": [],
+                "loan_applications": {},
+                "approved_loans": {}
+            }
+        return loaded_data
