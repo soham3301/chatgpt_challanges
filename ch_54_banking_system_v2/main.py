@@ -408,7 +408,7 @@ def manager_check_loan_applications():
     if applications_dict:
         the_display.pending_applications_screen()
         for cust_id, loan_details in applications_dict.items():
-            the_display.view_pending_loan_applications(cust_id, loan_details["loan_amount"], loan_details["monthly_emi"], loan_details["repayment_amount"])
+            the_display.view_pending_loan_applications(cust_id, loan_details["loan_amount"], loan_details["monthly_emi"], loan_details["repayment_amount"], loan_details["monthly_income"])
     else:
         the_display.no_pending_loan_application()
 
@@ -436,15 +436,21 @@ def manager_approve_loan():
     else:
         the_display.invalid_input()
 
+def manager_reject_loan_application():
+    pass
+
+def manager_check_loan_status():
+    pass
+
 def manager_close_loan():
-    application_list = my_bank.manager.get_loan_closure_applications()
-    if application_list:
-        for closure_application in application_list:
+    closure_application_list = my_bank.manager.get_loan_closure_applications()
+    if closure_application_list:
+        for closure_application in closure_application_list:
             the_display.show_loan_closure_applications(closure_application)
         the_display.choose_loan_number_for_closure()
         the_loan_number = user_input.text_input()
         if the_loan_number:
-            if the_loan_number in application_list:
+            if the_loan_number in closure_application_list:
                 loan_status = my_bank.manager.check_loan_status(the_loan_number)
                 the_display.show_loan_status_by_manager(loan_status)
                 the_display.close_this_loan_account()
@@ -465,17 +471,26 @@ def manager_close_loan():
     else:
         the_display.no_closing_application_exist()
 
+def manager_check_all_accounts():
+    pass
+
+def manager_check_all_customers():
+    pass
+
+def manager_change_password():
+    pass
+
 def manager_mapper(m_choice):
     saved_managers_commands = {
         "1": manager_unlock_account,
         "2": manager_check_loan_applications,
         "3": manager_approve_loan,
-        "4": ...,
-        "5": ...,
+        "4": manager_reject_loan_application,
+        "5": manager_check_loan_status,
         "6": manager_close_loan,
-        "7": ...,
-        "8": ...,
-        "9": ...,
+        "7": manager_check_all_accounts,
+        "8": manager_check_all_customers,
+        "9": manager_change_password,
     }
     saved_managers_commands[m_choice]()
 

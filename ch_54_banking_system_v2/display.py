@@ -315,8 +315,8 @@ To Confirm this, Type 'Y' for 'YES'
     def pending_applications_screen(self):
         print("These are the pending loan applications")
 
-    def view_pending_loan_applications(self, c_id, req_amount, emi, repay_amount):
-        print(f"Customer ID: {c_id} | Loan Ammount Requested: {req_amount}/- | Monthly EMI: {emi}/- | Total Repayment Amount: {repay_amount}/-")
+    def view_pending_loan_applications(self, c_id, req_amount, emi, repay_amount, income):
+        print(f"Customer ID: {c_id} | Loan Ammount Requested: {req_amount}/- | Monthly EMI: {emi}/- | Total Repayment Amount: {repay_amount}/- | Monthly Income: {income}/-")
 
     def varify_loan_display(self, name, age, loan_amt, repay_amt, tanure, emi, ac_no, bal, total_trans, income):
         print(f'''

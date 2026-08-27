@@ -1,5 +1,4 @@
 
-#? Note:- This total application is for customers. A Manager should use another system, not the same. However, hardcoding password into the application is wrong.
 #? Note:- Didn't Focused on login security of Manager. Here I introduced manager just to approve loans and unlock accounts.
 #? Note:- Bank became too large, Hence the entire loan section is shifted to Manager. Otherwise, Loan should be inside Bank.
 #? Note:- In an ideal scenario, there will be multiple managers who are handling different types of loans according to their authority and role.
