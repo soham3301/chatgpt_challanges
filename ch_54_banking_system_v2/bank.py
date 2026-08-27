@@ -23,6 +23,7 @@ class Bank:
         self.customers[the_customer.cust_id] = the_customer
 
     def user_validation(self, customer_id, customer_password):
+        #! Note:- Dead method. Not in use
         if customer_id in self.customers:
             self.customers[customer_id].check_login(customer_id, customer_password)
             return True

@@ -152,6 +152,7 @@ class Recorder:
                 "password": "12345",
                 "locked_account_numbers": [],
                 "loan_applications": {},
+                "loan_closure_applications": [],
                 "approved_loans": {}
             }
         return loaded_data
