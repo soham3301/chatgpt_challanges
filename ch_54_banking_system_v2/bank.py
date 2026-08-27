@@ -49,7 +49,6 @@ class Bank:
     def get_loan(self, loan_ac_no):
         return self.manager.show_approved_loan(loan_ac_no)
 
-
     def create_customer(self, name, age, email_id, mobile_number):
         new_customer = Customer(name, age, email_id, mobile_number)
         new_customer.generate_customer_id_and_password()
@@ -86,6 +85,12 @@ class Bank:
 
     def ask_manager_receive_loan_closure_application(self, loan_ac_no):
         self.manager.receive_loan_closure_application(loan_ac_no)
+
+    def send_all_account_numbers(self):
+        return self.accounts.keys()
+
+    def send_all_customer_ids(self):
+        return self.customers.keys()
 
     @staticmethod
     def validate_age(age):

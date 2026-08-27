@@ -129,21 +129,6 @@ Use them for login
     def insufficient_balance(self):
         print("Insufficient Balance. Transaction Cancelled")
 
-    def enter_old_password(self):
-        print("Enter Your Old Password")
-
-    def enter_new_password(self):
-        print("Enter New Password")
-
-    def confirm_password(self):
-        print("Enter the same Password again")
-
-    def password_doesnot_match(self):
-        print("Password doesn't match.")
-
-    def pass_changed(self):
-        print("Your Password has successfully changed")
-
     def show_transactions(self):
         print("DEPOSIT WITHDRAW SENT RECEIVED BALANCE | TRAN ID")
 
@@ -183,7 +168,6 @@ Loan Account Number: {loan_ac_no}
 Customer ID: {cust_id}
 Password: {password}
 ''')
-
 
 #?  ==================== LOAN DISPLAYS =======================
 
@@ -229,15 +213,11 @@ To Confirm this, Type 'Y' for 'YES'
     def no_loan_available(self):
         print("You don't have any active loan as of now")
 
-    def show_loan_status(self, status):
-        print(status)
-
     def repay_full_or_only_emi(self, full_amount, emi_amount):
         print(f'''
 1. Pay only one EMI.                Rs:- {emi_amount}/-
 2. Pay Full Repayment Amount:       Rs:- {full_amount}/-
 ''')
-
 
     def ask_user_to_repay(self, amount, full_or_emi):
         print(f"Want to pay {full_or_emi} of Rs:- {amount}/- ? The amount will be deducted from your Account. Type 'Y' for 'YES'")
@@ -266,18 +246,6 @@ To Confirm this, Type 'Y' for 'YES'
     def loan_closure_application_submitted(self, loan_ac_no):
         print(f"Your Loan (Loan Account Number: {loan_ac_no}) closure request has been submitted to the Manager. Kindly wait 1 to 2 Business Days for the Loan Closure.")
 
-
-
-
-
-
-
-
-
-
-
-
-
 #?  ==================== MANAGER DISPLAYS =======================
 
     def enter_managers_password(self):
@@ -291,8 +259,8 @@ To Confirm this, Type 'Y' for 'YES'
 4. Reject Loan Application
 5. Check Loan Status
 6. Close Loan
-7. Check Total Available Accounts
-8. Check Total Available Customers
+7. Check All Accounts
+8. Check All Customers
 9. Change Password
 0. Exit
 ''')
@@ -333,7 +301,7 @@ Loan Tanure (in months):        {tanure}
 ''')
 
     def loan_approval_confirmation(self, name, amount):
-        print(f"Type 'Y' to CONFIRM the Rs: {amount}/- loan of {name}")
+        print(f"Type 'Y' to APPROVE the Rs: {amount}/- loan of {name}")
 
     def loan_approved(self, number):
         print(f"The loan has been approved. Loan Account Nunber: {number}")
@@ -341,17 +309,27 @@ Loan Tanure (in months):        {tanure}
     def loan_processing_cancelled(self, name):
         print(f"Loan Application of {name} has been cancelled as of now")
 
+    def reject_this_loan_application(self, name, loan_amt, repay_amt, emi, income):
+        print(f'''
+Want to REJECT the loan application of {name}?
 
+Key Details:-
+Requested Amount:-          {loan_amt}/-
+Repayment Amount:-          {repay_amt}/-
+Monthly EMI:-               {emi}/-
+Monthly Income:-            {income}/-
 
+Type 'Y' to 'REJECT'
+''')
 
+    def loan_rejection_halted(self, name):
+        print(f"The rejection of Loan Application of {name} has been halted for now.")
 
+    def loan_rejected(self, name, amount):
+        print(f"The loan application of {name} for amount Rs:- {amount}/- has been Rejected.")
 
-
-
-
-
-
-
+    def enter_loan_number(self):
+        print("Enter Loan Number from Above")
 
     def no_closing_application_exist(self):
         print("No application has been submitted for loan closure")
@@ -362,8 +340,6 @@ Loan Tanure (in months):        {tanure}
     def choose_loan_number_for_closure(self):
         print("\nChoose a Loan from above for further procedure | Type the exact Loan Account Number below")
 
-    def show_loan_status_by_manager(self, status_loan):
-        print(status_loan)
 
     def close_this_loan_account(self):
         print("Press 'Y' to close this Loan.")
@@ -374,13 +350,35 @@ Loan Tanure (in months):        {tanure}
     def loan_closed_successfully(self, loan_ac_no):
         print(f"The Loan ({loan_ac_no}) has been successfully Closed")
 
-
-
-
 #?  ==================== GENERIC DISPLAYS =======================
+
+    def show_received_data(self, data):
+        #? Note:- I am experimenting with this method of printing outout. Only using in this function.
+        print(data)
 
     def logged_out(self):
         print("Logged Out")
+
+    def received_list_header(self, data):
+        print(f"These are the {data}")
+
+    def show_received_list(self, number):
+        print(number)
+
+    def enter_old_password(self):
+        print("Enter Your Old Password")
+
+    def enter_new_password(self):
+        print("Enter New Password")
+
+    def confirm_password(self):
+        print("Enter the same Password again")
+
+    def password_doesnot_match(self):
+        print("Password doesn't match.")
+
+    def pass_changed(self):
+        print("Your Password has successfully changed")
 
     def confirm_amount(self, amount, tran_type):
         print(f"You are about to {tran_type} Rs:- {amount}/-. To Confirm type 'Y'.")

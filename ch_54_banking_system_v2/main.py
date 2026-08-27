@@ -277,7 +277,7 @@ def command_show_loan_status(cust):
     if cust.loan_account_number:
         loan = my_bank.get_loan(cust.loan_account_number)
         loan_status = cust.prepare_loan_data(loan)
-        the_display.show_loan_status(loan_status)
+        the_display.show_received_data(loan_status)
     else:
         the_display.no_loan_available()
 
@@ -437,10 +437,39 @@ def manager_approve_loan():
         the_display.invalid_input()
 
 def manager_reject_loan_application():
-    pass
+    the_display.enter_customer_id()
+    entered_cust_id = user_input.text_input()
+    if entered_cust_id:
+        if my_bank.manager.is_already_applied(entered_cust_id):
+            the_loan_application = my_bank.manager.show_loan_applications()[entered_cust_id]
+            loan_customer = my_bank.get_customer(entered_cust_id)
+            #* Note:- Getting hold of the customer object where only the name of customer is needed is not a good code I think.
+            #* Note:- Instead I could make a function inside bank object where the function sends only customer name or other attributes as requested.
+            the_display.reject_this_loan_application(loan_customer.name, the_loan_application["loan_amount"], the_loan_application["repayment_amount"], the_loan_application["monthly_emi"], the_loan_application["monthly_income"])
+            loan_cancellation_consent = user_input.text_input().lower()
+            if loan_cancellation_consent == "y":
+                my_bank.manager.reject_loan_application(loan_customer.cust_id)
+                the_display.loan_rejected(loan_customer.name, the_loan_application["loan_amount"])
+                my_bank.save_data()
+            else:
+                the_display.loan_rejection_halted(loan_customer.name)
+        else:
+            the_display.id_not_exist()
+    else:
+        the_display.invalid_input()
 
 def manager_check_loan_status():
-    pass
+    all_loans_as_dict_keys = my_bank.manager.show_all_active_loan_numbers()
+    the_display.received_list_header("Loan Account Numbers")
+    for loan_ac_no in all_loans_as_dict_keys:
+        the_display.show_received_list(loan_ac_no)
+    the_display.enter_loan_number()
+    the_loan_number = user_input.text_input()
+    if the_loan_number:
+        loan_data = my_bank.manager.check_loan_status(the_loan_number)
+        the_display.show_received_data(loan_data)
+    else:
+        the_display.invalid_input()
 
 def manager_close_loan():
     closure_application_list = my_bank.manager.get_loan_closure_applications()
@@ -452,7 +481,7 @@ def manager_close_loan():
         if the_loan_number:
             if the_loan_number in closure_application_list:
                 loan_status = my_bank.manager.check_loan_status(the_loan_number)
-                the_display.show_loan_status_by_manager(loan_status)
+                the_display.show_received_data(loan_status)
                 the_display.close_this_loan_account()
                 loan_close_consent = user_input.text_input().lower()
                 if loan_close_consent == "y":
@@ -472,13 +501,66 @@ def manager_close_loan():
         the_display.no_closing_application_exist()
 
 def manager_check_all_accounts():
-    pass
+    #? Note:- Here manager can see same details as customers. In real bank, manager should see more details than customers
+    account_numbers_as_dict_keys = my_bank.send_all_account_numbers()
+    the_display.received_list_header("all available Accounts")
+    for ac_no in account_numbers_as_dict_keys:
+        the_display.show_received_list(ac_no)
+    the_display.enter_account_number()
+    entered_account_number = user_input.number_input()
+    if entered_account_number:
+        the_account_object = my_bank.get_account(entered_account_number)
+        if the_account_object:
+            ac_data = the_account_object.send_account_information()
+            the_display.show_ac_info(ac_data["number"], ac_data["balance"], ac_data["interest_gained"], ac_data["customer_id"], ac_data["total_transactions"])
+        else:
+            the_display.invalid_input()
+    else:
+        the_display.invalid_input()
 
 def manager_check_all_customers():
-    pass
+    #? Note:- Here manager can see same details as customers. In real bank, manager should see more details than customers
+    customer_ids_as_dict_keys = my_bank.send_all_customer_ids()
+    the_display.received_list_header("all customer's ID")
+    for cust_id in customer_ids_as_dict_keys:
+        the_display.show_received_list(cust_id)
+    the_display.enter_customer_id()
+    entered_customer_id = user_input.text_input()
+    if entered_customer_id:
+        the_customer_object = my_bank.get_customer(entered_customer_id)
+        if the_customer_object:
+            cust_data = the_customer_object.check_customer_details()
+            the_display.show_customer_info(cust_data["name"], cust_data["age"], cust_data["email"], cust_data["mobile"], cust_data["account_number"], cust_data["loan_account_number"], cust_data["customer_id"], cust_data["password"])
+        else:
+            the_display.invalid_input()
+    else:
+        the_display.invalid_input()
 
 def manager_change_password():
-    pass
+    the_display.enter_old_password()
+    old_password = user_input.text_input()
+    if old_password:
+        if my_bank.manager.validate_login(old_password):
+            the_display.enter_new_password()
+            new_password = user_input.text_input()
+            if new_password:
+                the_display.confirm_password()
+                new_password_again = user_input.text_input()
+                if new_password_again:
+                    if new_password == new_password_again:
+                        my_bank.manager.change_password(new_password_again)
+                        the_display.pass_changed()
+                        my_bank.save_data()
+                    else:
+                        the_display.password_doesnot_match()
+                else:
+                    the_display.invalid_input()
+            else:
+                the_display.invalid_input()
+        else:
+            the_display.incorrect_password()
+    else:
+        the_display.invalid_input()
 
 def manager_mapper(m_choice):
     saved_managers_commands = {

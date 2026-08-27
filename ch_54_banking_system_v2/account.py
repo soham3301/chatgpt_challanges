@@ -124,8 +124,6 @@ class Account:
             })
         return transaction_list, new_balance
 
-
-
     def generate_cash_transaction(self, amount, transaction_type):
         the_transaction = Transaction()
         the_transaction.generate_tran_id()

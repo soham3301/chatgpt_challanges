@@ -48,6 +48,10 @@ class Manager:
     def show_loan_applications(self):
         return self.loan_applications
 
+    def reject_loan_application(self, customer_id):
+        del self.loan_applications[customer_id]
+        #* Note:- The customer should have a notification about their loan rejection.
+
     def get_loan_closure_applications(self):
         return self.loan_closure_applications
 
@@ -57,15 +61,22 @@ class Manager:
         else:
             return None
 
+    def show_all_active_loan_numbers(self):
+        return self.approved_loans.keys()
+
     def check_loan_status(self, loan_ac_no):
-        the_loan = self.approved_loans[loan_ac_no]
-        return f'''
-Customer ID: {the_loan.attached_customer}       |       Loan Account Number: {the_loan.loan_account_number}     |       Issued Loan Amount: {the_loan.loan_amount}/-
+        #? Note:- Saw in stack overflow, sending and receiving data this way. Experimenting with this.
+        if loan_ac_no in self.approved_loans:
+            the_loan = self.approved_loans[loan_ac_no]
+            return f'''
+    Customer ID: {the_loan.attached_customer}       |       Loan Account Number: {the_loan.loan_account_number}     |       Issued Loan Amount: {the_loan.loan_amount}/-
 
-Amount Unpaid: {the_loan.repayment_amount}/-    |       Amount Paid: {the_loan.amount_paid_till_now}/-
+    Amount Unpaid: {the_loan.repayment_amount}/-    |       Amount Paid: {the_loan.amount_paid_till_now}/-
 
-Total EMIs: {the_loan.emi_status["total"]}      |       Completed EMIs: {the_loan.emi_status["paid"]}           |       Pending EMIs: {the_loan.emi_status["unpaid"]}
-'''
+    Total EMIs: {the_loan.emi_status["total"]}      |       Completed EMIs: {the_loan.emi_status["paid"]}           |       Pending EMIs: {the_loan.emi_status["unpaid"]}
+    '''
+        else:
+            return "Incorrect Loan Account Number Entered"
 
     def approve_loan(self, application, customer, account):
         loan = Loan(customer.cust_id)
