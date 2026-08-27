@@ -101,6 +101,7 @@ Use them for login
 9. Apply for Loan
 10. Show Loan Status
 11. Repay Loan
+12. Request for Loan Closure
 0. Exit
 ''')
 
@@ -216,6 +217,12 @@ To Confirm this, Type 'Y' for 'YES'
     def loan_applied_successfully(self):
         print("Your Loan Application is successfully applied")
 
+    def loan_application_cancelled(self):
+        print("Your Loan Application Process has been cancelled")
+
+    def already_have_loan(self):
+        print("You already have an ongoing loan. Close the loan by repaying the remaining amount for further loan request")
+
     def already_applied(self):
         print("You have already applied for a loan. Kindly wait before applying again.")
 
@@ -224,6 +231,43 @@ To Confirm this, Type 'Y' for 'YES'
 
     def show_loan_status(self, status):
         print(status)
+
+    def repay_full_or_only_emi(self, full_amount, emi_amount):
+        print(f'''
+1. Pay only one EMI.                Rs:- {emi_amount}/-
+2. Pay Full Repayment Amount:       Rs:- {full_amount}/-
+''')
+
+
+    def ask_user_to_repay(self, amount, full_or_emi):
+        print(f"Want to pay {full_or_emi} of Rs:- {amount}/- ? The amount will be deducted from your Account. Type 'Y' for 'YES'")
+
+    def loan_payment_cancelled(self, emi_or_full):
+        print(f"Your {emi_or_full} Procedure has been cancelled")
+
+    def no_pending_emi(self):
+        print("You don't have any pending EMI left. You can proceed to Loan Closure Now.")
+
+    def pay_loan_amount(self, amount):
+        print(f"Kindly enter the exact amount of Rs:- {amount}/-")
+
+    def wrong_amount_paid(self, paid, emi, emi_or_full):
+        print(f"Sorry you paid Rs:- {paid}/- which doesn't match the {emi_or_full} of Rs:- {emi}/- | Transaction Cancelled")
+
+    def emi_payment_successfull(self, unpaid, repay_amt):
+        print(f"EMI payment successfull. Now you have {unpaid} EMIs left. Loan remains Rs:- {repay_amt}/-")
+
+    def loan_full_repayment_successfull(self, repay_amt):
+        print(f"You re-paid the entire loan successfully. Total Amount Paid Rs:- {repay_amt}/- | You may now initiate the Loan Closure Procedure")
+    
+    def emis_not_cleared(self, unpaid_emis, unpaid_amount):
+        print(f"Can't initiate Loan Closure. You still have {unpaid_emis} pending EMIs worth Rs:- {unpaid_amount}/-")
+
+    def loan_closure_application_submitted(self, loan_ac_no):
+        print(f"Your Loan (Loan Account Number: {loan_ac_no}) closure request has been submitted to the Manager. Kindly wait 1 to 2 Business Days for the Loan Closure.")
+
+
+
 
 
 
@@ -244,7 +288,7 @@ To Confirm this, Type 'Y' for 'YES'
 1. Unlock Account
 2. Check Pending Loan Applications
 3. Approve Loan
-4. Reject Loan
+4. Reject Loan Application
 5. Check Loan Status
 6. Close Loan
 7. Check Total Available Accounts
@@ -300,15 +344,45 @@ Loan Tanure (in months):        {tanure}
 
 
 
+
+
+
+
+
+
+
+
+
+    def no_closing_application_exist(self):
+        print("No application has been submitted for loan closure")
+
+    def show_loan_closure_applications(self, loan_ac_no):
+        print(f"Application submitted for loan closure. Loan Account Number: {loan_ac_no}")
+    
+    def choose_loan_number_for_closure(self):
+        print("\nChoose a Loan from above for further procedure | Type the exact Loan Account Number below")
+
+    def show_loan_status_by_manager(self, status_loan):
+        print(status_loan)
+
+    def close_this_loan_account(self):
+        print("Press 'Y' to close this Loan.")
+
+    def loan_account_close_halted(self, loan_ac_no):
+        print(f"Closure of the Loan Account ({loan_ac_no}) is Halted. Investigate Further.")
+
+    def loan_closed_successfully(self, loan_ac_no):
+        print(f"The Loan ({loan_ac_no}) has been successfully Closed")
+
+
+
+
 #?  ==================== GENERIC DISPLAYS =======================
 
     def logged_out(self):
         print("Logged Out")
 
-    def loan_application_cancelled(self):
-        print("Your Loan Application Process has been cancelled")
-
-    def comfirm_amount(self, amount, tran_type):
+    def confirm_amount(self, amount, tran_type):
         print(f"You are about to {tran_type} Rs:- {amount}/-. To Confirm type 'Y'.")
 
     def transaction_unsuccessfull(self, tran_type):

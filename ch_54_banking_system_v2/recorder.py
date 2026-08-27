@@ -65,6 +65,7 @@ class Recorder:
                 "password": the_manager.password,
                 "locked_account_numbers": the_manager.locked_account_numbers,
                 "loan_applications": the_manager.loan_applications,
+                "loan_closure_applications": the_manager.loan_closure_applications,
                 "approved_loans": {}
             }
             if len(the_manager.approved_loans) > 0:
@@ -144,6 +145,7 @@ class Recorder:
                 loaded_data["password"] = data["password"]
                 loaded_data["locked_account_numbers"] = data["locked_account_numbers"]
                 loaded_data["loan_applications"] = data["loan_applications"]
+                loaded_data["loan_closure_applications"] = data["loan_closure_applications"]
                 loaded_data["approved_loans"] = data["approved_loans"]
         except json.JSONDecodeError:
             loaded_data = {

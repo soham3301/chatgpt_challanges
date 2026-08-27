@@ -73,7 +73,7 @@ class Customer:
         #? Note:- I could have used loan_object.attribute instead of __dict__.copy().
         loan_obj = loan_object.__dict__.copy()
         data = f'''
-Loan Account Number: {loan_obj["loan_account_number"]}  |       Loan Tenure: {loan_obj["loan_tanure_in_months"]} months     |       jLoan Amount: {loan_obj["loan_amount"]}/-
+Loan Account Number: {loan_obj["loan_account_number"]}  |       Loan Tenure: {loan_obj["loan_tanure_in_months"]} months     |       Loan Amount: {loan_obj["loan_amount"]}/-
 Unpaid Amount: {loan_obj["repayment_amount"]}/-         |       Paid Amount: {loan_obj["amount_paid_till_now"]}/-
 EMI: {loan_obj["emi_amount"]}/- per Month
 Paid EMI: {loan_obj["emi_status"]["paid"]} nos          |       Unpaid EMI: {loan_obj["emi_status"]["unpaid"]} nos

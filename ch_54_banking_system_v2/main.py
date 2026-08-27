@@ -10,7 +10,7 @@ the_display = Display()
 #* Testing Ground
 # my_bank.save_data()
 # print(my_bank.manager.approved_loans)
-#! Task - Repay Loan --- point 11
+
 
 #* Testing Ground End
 
@@ -36,7 +36,7 @@ def create_account_flow():
                                 first_deposit = user_input.number_input()
                                 if first_deposit:
                                     if Bank.validate_first_deposit(first_deposit):
-                                        the_display.comfirm_amount(first_deposit, "deposit")
+                                        the_display.confirm_amount(first_deposit, "deposit")
                                         first_dep_confirmation = user_input.text_input().lower()
                                         if first_dep_confirmation == "y":
                                             customer = my_bank.create_customer(name, age, email.lower(), mobile)
@@ -111,7 +111,7 @@ def command_deposit(ac):
     the_display.enter_amount()
     amount = user_input.number_input()
     if amount:
-        the_display.comfirm_amount(amount, "deposit")
+        the_display.confirm_amount(amount, "deposit")
         dep_confirmation = user_input.text_input().lower()
         if dep_confirmation == "y":
             if ac.cash_deposit(amount):
@@ -129,7 +129,7 @@ def command_withdraw(ac):
     amount = user_input.number_input()
     if amount:
         if ac.is_balance_sufficient(amount):
-            the_display.comfirm_amount(amount, "withdraw")
+            the_display.confirm_amount(amount, "withdraw")
             wit_confirmation = user_input.text_input().lower()
             if wit_confirmation == "y":
                 if ac.cash_withdraw(amount):
@@ -149,7 +149,7 @@ def command_transfer(ac):
     amount = user_input.number_input()
     if amount:
         if ac.is_balance_sufficient(amount):
-            the_display.comfirm_amount(amount, "transfer")
+            the_display.confirm_amount(amount, "transfer")
             tran_confirmation = user_input.text_input().lower()
             if tran_confirmation == "y":
                 the_display.enter_recepients_account_number()
@@ -230,43 +230,46 @@ def command_show_customer_details(cust):
     the_display.show_customer_info(cust_data["name"], cust_data["age"], cust_data["email"], cust_data["mobile"], cust_data["account_number"], cust_data["loan_account_number"], cust_data["customer_id"], cust_data["password"])
 
 def command_apply_for_loan(cust, ac):
-    if not my_bank.manager.is_already_applied(cust.cust_id):
-        the_display.loan_application_started()
-        the_display.how_much_loan_you_need()
-        requested_loan_amount = user_input.number_input()
-        if requested_loan_amount:
-            the_display.monthly_income()
-            entered_monthly_income = user_input.number_input()
-            if entered_monthly_income:
-                possible_loans = my_bank.manager.get_possible_loan_data(cust.cust_id, requested_loan_amount, entered_monthly_income, ac.balance)
-                if len(possible_loans) == 0:
-                    the_display.not_eligible_for_loan()
-                else:
-                    loan_numbers = []
-                    for loan_serial, loan_item in possible_loans.items():
-                        loan_numbers.append(loan_serial)
-                        the_display.show_possible_loans(loan_serial, loan_item["loan_amount"], loan_item["repayment_amount"], loan_item["tanure_in_months"], loan_item["yearly_interest"], loan_item["monthly_emi"])
-                    the_display.choose_the_loan_number()
-                    loan_number = user_input.number_input()
-                    if loan_number:
-                        if loan_number in loan_numbers:
-                            final_loan_data = possible_loans[loan_number]
-                            the_display.apply_loan_confirmation(final_loan_data["loan_amount"], final_loan_data["repayment_amount"], final_loan_data["tanure_in_months"], final_loan_data["yearly_interest"], final_loan_data["monthly_emi"])
-                            loan_confirmation = user_input.text_input().lower()
-                            if loan_confirmation == "y":
-                                my_bank.manager.receive_loan_application(final_loan_data, cust.cust_id)
-                                the_display.loan_applied_successfully()
-                                my_bank.save_data()
+    if not my_bank.ask_manager_is_already_applied(cust.cust_id):
+        if not cust.loan_account_number:
+            the_display.loan_application_started()
+            the_display.how_much_loan_you_need()
+            requested_loan_amount = user_input.number_input()
+            if requested_loan_amount:
+                the_display.monthly_income()
+                entered_monthly_income = user_input.number_input()
+                if entered_monthly_income:
+                    possible_loans = my_bank.ask_manager_get_possible_loan_data(cust.cust_id, requested_loan_amount, entered_monthly_income, ac.balance)
+                    if len(possible_loans) == 0:
+                        the_display.not_eligible_for_loan()
+                    else:
+                        loan_numbers = []
+                        for loan_serial, loan_item in possible_loans.items():
+                            loan_numbers.append(loan_serial)
+                            the_display.show_possible_loans(loan_serial, loan_item["loan_amount"], loan_item["repayment_amount"], loan_item["tanure_in_months"], loan_item["yearly_interest"], loan_item["monthly_emi"])
+                        the_display.choose_the_loan_number()
+                        loan_number = user_input.number_input()
+                        if loan_number:
+                            if loan_number in loan_numbers:
+                                final_loan_data = possible_loans[loan_number]
+                                the_display.apply_loan_confirmation(final_loan_data["loan_amount"], final_loan_data["repayment_amount"], final_loan_data["tanure_in_months"], final_loan_data["yearly_interest"], final_loan_data["monthly_emi"])
+                                loan_confirmation = user_input.text_input().lower()
+                                if loan_confirmation == "y":
+                                    my_bank.ask_manager_receive_loan_application(final_loan_data, cust.cust_id)
+                                    the_display.loan_applied_successfully()
+                                    my_bank.save_data()
+                                else:
+                                    the_display.loan_application_cancelled()
                             else:
                                 the_display.loan_application_cancelled()
                         else:
-                            the_display.loan_application_cancelled()
-                    else:
-                        the_display.invalid_input()
+                            the_display.invalid_input()
+                else:
+                    the_display.invalid_input()
             else:
                 the_display.invalid_input()
         else:
-            the_display.invalid_input()
+            the_display.already_have_loan()
     else:
         the_display.already_applied()
 
@@ -278,8 +281,83 @@ def command_show_loan_status(cust):
     else:
         the_display.no_loan_available()
 
+#? Note:- EMI payment and Full repayment routing code looks kinda similar.
 def command_repay_loan(cust, ac):
-    print("Loan Repayment Section")
+    if cust.loan_account_number:
+        loan = my_bank.get_loan(cust.loan_account_number)
+        the_display.repay_full_or_only_emi(loan.repayment_amount, loan.emi_amount)
+        full_or_emi = user_input.text_input()
+        if full_or_emi == "1":
+            if not loan.is_all_emis_paid():
+                the_display.ask_user_to_repay(loan.emi_amount, "EMI")
+                pay_emi_consent = user_input.text_input().lower()
+                if pay_emi_consent == "y":
+                    the_display.pay_loan_amount(loan.emi_amount)
+                    paid_emi_amount = user_input.number_input()
+                    if paid_emi_amount:
+                        if loan.validate_emi_amount(paid_emi_amount):
+                            the_display.confirm_amount(paid_emi_amount, "transfer")
+                            emi_repay_confirmation = user_input.text_input().lower()
+                            if emi_repay_confirmation == "y":
+                                emi_transaction = ac.send_amount(paid_emi_amount, loan.loan_account_number)
+                                if emi_transaction:
+                                    loan.receive_emi_amount(paid_emi_amount)
+                                    the_display.emi_payment_successfull(loan.emi_status["unpaid"], loan.repayment_amount)
+                                    my_bank.save_data()
+                                else:
+                                    the_display.insufficient_balance()
+                            else:
+                                the_display.transaction_cancelled()
+                        else:
+                            the_display.wrong_amount_paid(paid_emi_amount, loan.emi_amount, "EMI Amount")
+                    else:
+                        the_display.invalid_input()
+                else:
+                    the_display.loan_payment_cancelled("EMI Payment")
+            else:
+                the_display.no_pending_emi()
+        elif full_or_emi == "2":
+            the_display.ask_user_to_repay(loan.repayment_amount, "the remaining Full Amount")
+            pay_full_amount_consent = user_input.text_input().lower()
+            if pay_full_amount_consent == "y":
+                the_display.pay_loan_amount(loan.repayment_amount)
+                paid_full_amount = user_input.number_input()
+                if paid_full_amount:
+                    if loan.validate_full_repayment_amount(paid_full_amount):
+                        the_display.confirm_amount(paid_full_amount, "transfer")
+                        full_amount_repay_confirmation = user_input.text_input().lower()
+                        if full_amount_repay_confirmation == "y":
+                            full_repay_transaction = ac.send_amount(paid_full_amount, loan.loan_account_number)
+                            if full_repay_transaction:
+                                loan.receive_full_repayment_amount(paid_full_amount)
+                                the_display.loan_full_repayment_successfull(loan.amount_paid_till_now)
+                                my_bank.save_data()
+                            else:
+                                the_display.insufficient_balance()
+                        else:
+                            the_display.transaction_cancelled()
+                    else:
+                        the_display.wrong_amount_paid(paid_full_amount, loan.repayment_amount, "Remaining Loan Amount")
+                else:
+                    the_display.invalid_input()
+            else:
+                the_display.loan_payment_cancelled("Full Loan Repayment")
+        else:
+            the_display.invalid_input()
+    else:
+        the_display.no_loan_available()
+
+def command_loan_close_request(cust):
+    if cust.loan_account_number:
+        loan = my_bank.get_loan(cust.loan_account_number)
+        if loan.is_all_emis_paid():
+            my_bank.ask_manager_receive_loan_closure_application(loan.loan_account_number)
+            the_display.loan_closure_application_submitted(loan.loan_account_number)
+            my_bank.save_data()
+        else:
+            the_display.emis_not_cleared(loan.emi_status["unpaid"], loan.repayment_amount)
+    else:
+        the_display.no_loan_available()
 
 def command_mapper(the_user_input, customer, account):
     saved_commands = {
@@ -294,10 +372,11 @@ def command_mapper(the_user_input, customer, account):
         "9": command_apply_for_loan,
         "10": command_show_loan_status,
         "11": command_repay_loan,
+        "12": command_loan_close_request,
     }
     if the_user_input in ["1", "2", "3", "4", "5", "7"]:
         saved_commands[the_user_input](account)
-    elif the_user_input in ["6", "8", "10"]:
+    elif the_user_input in ["6", "8", "10", "12"]:
         saved_commands[the_user_input](customer)
     else:
         saved_commands[the_user_input](customer, account)
@@ -337,7 +416,7 @@ def manager_approve_loan():
     the_display.enter_customer_id()
     entered_cust_id = user_input.text_input()
     if entered_cust_id:
-        if my_bank.manager.is_this_customer_applied(entered_cust_id):
+        if my_bank.manager.is_already_applied(entered_cust_id):
             the_loan_application = my_bank.manager.show_loan_applications()[entered_cust_id]
             loan_customer = my_bank.get_customer(entered_cust_id)
             loan_cust_account = my_bank.get_account(loan_customer.account_number)
@@ -357,6 +436,35 @@ def manager_approve_loan():
     else:
         the_display.invalid_input()
 
+def manager_close_loan():
+    application_list = my_bank.manager.get_loan_closure_applications()
+    if application_list:
+        for closure_application in application_list:
+            the_display.show_loan_closure_applications(closure_application)
+        the_display.choose_loan_number_for_closure()
+        the_loan_number = user_input.text_input()
+        if the_loan_number:
+            if the_loan_number in application_list:
+                loan_status = my_bank.manager.check_loan_status(the_loan_number)
+                the_display.show_loan_status_by_manager(loan_status)
+                the_display.close_this_loan_account()
+                loan_close_consent = user_input.text_input().lower()
+                if loan_close_consent == "y":
+                    the_loan = my_bank.get_loan(the_loan_number)
+                    loan_closing_customer = my_bank.get_customer(the_loan.attached_customer)
+                    my_bank.manager.close_loan(the_loan_number, loan_closing_customer)
+                    if not loan_closing_customer.loan_account_number:
+                        the_display.loan_closed_successfully(the_loan_number)
+                        my_bank.save_data()
+                else:
+                    the_display.loan_account_close_halted(the_loan_number)
+            else:
+                the_display.invalid_input()
+        else:
+            the_display.invalid_input()
+    else:
+        the_display.no_closing_application_exist()
+
 def manager_mapper(m_choice):
     saved_managers_commands = {
         "1": manager_unlock_account,
@@ -364,7 +472,7 @@ def manager_mapper(m_choice):
         "3": manager_approve_loan,
         "4": ...,
         "5": ...,
-        "6": ...,
+        "6": manager_close_loan,
         "7": ...,
         "8": ...,
         "9": ...,
@@ -391,7 +499,7 @@ while bank_open:
                     my_bank.save_data()
                     the_display.logged_out()
                     break
-                elif second_user_input in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]:
+                elif second_user_input in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]:
                     command_mapper(second_user_input, the_customer, the_account)
                 else:
                     the_display.invalid_input()

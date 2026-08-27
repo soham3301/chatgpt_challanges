@@ -31,7 +31,7 @@ class Bank:
 
     def get_customer(self, customer_id):
         if customer_id:
-            if customer_id in  self.customers:
+            if customer_id in self.customers:
                 return self.customers[customer_id]
             else:
                 return None
@@ -73,6 +73,19 @@ class Bank:
         the_account = self.get_account(self.get_customer(customer_id).account_number)
         if the_account:
             return the_account.is_locked
+
+    #* Note:- These (ask_manager_...) functions are made because I think a customer should not access Manager's methods directly. A customer should talk to bank only.
+    def ask_manager_is_already_applied(self, customer_id):
+        return self.manager.is_already_applied(customer_id)
+
+    def ask_manager_get_possible_loan_data(self, customer_id, requested_loan_amount, monthly_income, account_balance):
+        return self.manager.get_possible_loan_data(customer_id, requested_loan_amount, monthly_income, account_balance)
+
+    def ask_manager_receive_loan_application(self, loan_data, customer_id):
+        self.manager.receive_loan_application(loan_data, customer_id)
+
+    def ask_manager_receive_loan_closure_application(self, loan_ac_no):
+        self.manager.receive_loan_closure_application(loan_ac_no)
 
     @staticmethod
     def validate_age(age):
@@ -137,4 +150,4 @@ class Bank:
         else:
             self.email_mobile_set = set()
         loaded_manager_data = self.recorder.load_manager_data()
-        self.manager.load_data(loaded_manager_data["password"], loaded_manager_data["locked_account_numbers"], loaded_manager_data["loan_applications"], loaded_manager_data["approved_loans"])
+        self.manager.load_data(loaded_manager_data["password"], loaded_manager_data["locked_account_numbers"], loaded_manager_data["loan_applications"], loaded_manager_data["loan_closure_applications"], loaded_manager_data["approved_loans"])

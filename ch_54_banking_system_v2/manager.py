@@ -13,16 +13,11 @@ class Manager:
         self.password = None
         self.locked_account_numbers = []
         self.loan_applications = {}
+        self.loan_closure_applications = []
         self.approved_loans = {}
 
     def change_password(self, new_password):
         self.password = new_password
-
-    def is_this_customer_applied(self, cust_id):
-        if cust_id in self.loan_applications:
-            return True
-        else:
-            return False
 
     def is_already_applied(self, customer_id):
         if customer_id in self.loan_applications:
@@ -35,6 +30,9 @@ class Manager:
 
     def receive_loan_application(self, loan_data, customer_id):
         self.loan_applications[customer_id] = loan_data
+
+    def receive_loan_closure_application(self, loan_account_number):
+        self.loan_closure_applications.append(loan_account_number)
 
     def get_possible_loan_data(self, customer_id, requested_amount, monthly_income, bank_balance):
         new_loan = Loan(customer_id)
@@ -51,11 +49,24 @@ class Manager:
     def show_loan_applications(self):
         return self.loan_applications
 
+    def get_loan_closure_applications(self):
+        return self.loan_closure_applications
+
     def show_approved_loan(self, loan_ac_number):
         if loan_ac_number in self.approved_loans:
             return self.approved_loans[loan_ac_number]
         else:
             return None
+
+    def check_loan_status(self, loan_ac_no):
+        the_loan = self.approved_loans[loan_ac_no]
+        return f'''
+Customer ID: {the_loan.attached_customer}       |       Loan Account Number: {the_loan.loan_account_number}     |       Issued Loan Amount: {the_loan.loan_amount}/-
+
+Amount Unpaid: {the_loan.repayment_amount}/-    |       Amount Paid: {the_loan.amount_paid_till_now}/-
+
+Total EMIs: {the_loan.emi_status["total"]}      |       Completed EMIs: {the_loan.emi_status["paid"]}           |       Pending EMIs: {the_loan.emi_status["unpaid"]}
+'''
 
     def approve_loan(self, application, customer, account):
         loan = Loan(customer.cust_id)
@@ -68,10 +79,16 @@ class Manager:
         del self.loan_applications[customer.cust_id]
         return loan.loan_account_number
 
-    def load_data(self, received_password, locked_ac_numbers, submitted_loan_applications, loans_already_approved):
+    def close_loan(self, loan_ac_no, customer):
+        del self.approved_loans[loan_ac_no]
+        self.loan_closure_applications.remove(loan_ac_no)
+        customer.clear_loan()
+
+    def load_data(self, received_password, locked_ac_numbers, submitted_loan_applications, submitted_loan_closure_applications, loans_already_approved):
         self.password = received_password
         self.locked_account_numbers = locked_ac_numbers
         self.loan_applications = submitted_loan_applications
+        self.loan_closure_applications = submitted_loan_closure_applications
         if len(loans_already_approved) > 0:
             for loan_ac_number, loan_dict in loans_already_approved.items():
                 loan = Loan(loan_dict["attached_customer"])
