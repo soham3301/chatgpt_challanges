@@ -14,7 +14,6 @@ players = {
     },
 }
 
-#? ================ Master Functions ================
 
 def display_board_and_input():
     try:
