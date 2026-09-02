@@ -4,3 +4,10 @@ if (number % 2 == 0):
     print("This is an EVEN number")
 else:
     print("This is an ODD number")
+
+
+
+
+
+
+#This is a comment just to test something
