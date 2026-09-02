@@ -1,7 +1,7 @@
 
 class Display:
     def __init__(self):
-        self.name = "Display"
+        self.name = "DISPLAY"
 
     def welcome_screen(self):
         print("Welcome to the Library")
