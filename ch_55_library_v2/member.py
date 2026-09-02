@@ -6,3 +6,8 @@ class Member:
         self.user_id = user_id
         self.user_pass = user_password
         self.borrowed_book_ids = []
+
+    def validate_login(self, password):
+        return self.user_pass == password
+
+    
