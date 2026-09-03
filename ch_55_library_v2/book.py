@@ -18,3 +18,6 @@ class Book:
         the_random_id = first_l + second_l + third_l + fourth_l + str(fifth_l) + str(a_random_number)
         self.id = ''.join(random.sample(the_random_id, len(the_random_id)))
         return self.id
+
+    def load_book_id(self, b_id):
+        self.id = b_id

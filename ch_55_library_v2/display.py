@@ -15,6 +15,12 @@ class Display:
     def enter_password(self):
         print("Enter Your Password")
 
+    def enter_new_password(self):
+        print("Enter New Password")
+
+    def password_changed(self):
+        print("Password Changed Successfully")
+
     def member_not_found(self, member_id):
         print(f"This member ID {member_id} does not exist")
 
@@ -66,7 +72,16 @@ class Display:
     def admin_primary_display(self):
         print(f'''
 1. Add Book
+2. Change Password
+3. Check Library Fund
+4. Change Late Fee
 ''')
+
+    def show_fund(self, amount):
+        print(f"The Library has Rs:- {amount}/- Fund Left")
+
+    def insufficient_fund(self):
+        print("Insufficient Fund")
 
     def enter_book_title(self):
         print("Enter Book Title")

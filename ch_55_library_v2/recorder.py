@@ -6,13 +6,24 @@ class Recorder:
         self.name = "RECORDER"
 
     def load_admin(self):
-        pass
+        try:
+            with open("./data/admin.json") as admin_file:
+                data = json.load(admin_file)
+                return data
+        except json.JSONDecodeError:
+            return {}
 
-    def save_admin(self):
-        pass
+    def save_admin(self, admin_dict):
+        with open("./data/admin.json", mode="w") as admin_file:
+            json.dump(admin_dict, admin_file, indent=4)
 
     def load_members(self):
-        pass
+        try:
+            with open("./data/members.json") as member_file:
+                data = json.load(member_file)
+                return data
+        except json.JSONDecodeError:
+            return {}
 
     def save_members(self, members_dict):
         formatted_members = {}
@@ -28,7 +39,12 @@ class Recorder:
             json.dump(formatted_members, member_file, indent=4)
 
     def load_books(self):
-        pass
+        try:
+            with open("./data/books.json") as book_file:
+                data = json.load(book_file)
+                return data
+        except json.JSONDecodeError:
+            return {}
 
     def save_books(self, books_dict):
         formatted_books = {}
@@ -55,7 +71,13 @@ class Recorder:
         pass
 
     def load_finance(self):
-        pass
+        try:
+            with open("./data/finance.json") as finance_file:
+                data = json.load(finance_file)
+                return data
+        except json.JSONDecodeError:
+            return {}
 
-    def save_finance(self):
-        pass
+    def save_finance(self, fin_dict):
+        with open("./data/finance.json", mode="w") as finance_file:
+            json.dump(fin_dict, finance_file, indent=4)

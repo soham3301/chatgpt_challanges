@@ -49,7 +49,7 @@ def sign_up_flow():
                             display.user_id_taken(member_user_id)
                             continue
                         else:
-                            display.enter_password()
+                            display.enter_new_password()
                             member_password = usr_input.text_input()
                             if member_password:
                                 display.confirm_password()
@@ -95,18 +95,43 @@ def admin_logged_in():
                 display.enter_book_price()
                 book_price = usr_input.number_input()
                 if book_price:
-                    display.enter_author_name()
-                    book_author = usr_input.text_input()
-                    if book_author:
-                        book_data = library.create_book(book_title, round(abs(book_price)), book_author)
-                        display.show_readymade_data(book_data)
-                        library.save_data()
+                    if library.finance.check_balance_available_or_not(book_price):
+                        display.enter_author_name()
+                        book_author = usr_input.text_input()
+                        if book_author:
+                            book_data = library.create_book(book_title, round(abs(book_price)), book_author)
+                            display.show_readymade_data(book_data)
+                            library.save_data()
+                        else:
+                            display.invalid_input()
                     else:
-                        display.invalid_input()
+                        display.insufficient_fund()
                 else:
                     display.invalid_input()
             else:
                 display.invalid_input()
+        elif admin_input == "2":
+            display.enter_new_password()
+            new_pass = usr_input.text_input()
+            if new_pass:
+                display.confirm_password()
+                confirm_new_pass = usr_input.text_input()
+                if confirm_new_pass:
+                    if new_pass == confirm_new_pass:
+                        library.admin.change_password(confirm_new_pass)
+                        display.password_changed()
+                        library.save_data()
+                    else:
+                        display.incorrect_password()
+                else:
+                    display.invalid_input()
+            else:
+                display.invalid_input()
+        elif admin_input == "3":
+            fund_data = library.finance.check_vault()
+            display.show_fund(fund_data)
+        elif admin_input == "4":
+            ...
         else:
             display.invalid_input()
 

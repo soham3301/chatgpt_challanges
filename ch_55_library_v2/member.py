@@ -10,4 +10,5 @@ class Member:
     def validate_login(self, password):
         return self.user_pass == password
 
-    
+    def load_borrowed_book_ids(self, id_list):
+        self.borrowed_book_ids = id_list

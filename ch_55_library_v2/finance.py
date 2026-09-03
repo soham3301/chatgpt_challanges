@@ -11,6 +11,9 @@ class Finance:
     def check_vault(self):
         return self.vault
 
+    def check_balance_available_or_not(self, book_price):
+        return self.vault > book_price
+
     def spend_amount(self, amount):
         self.vault -= amount
 
@@ -26,5 +29,6 @@ class Finance:
             "late_fee": self.late_fee
         }
 
-    def load_fin_data(self, vault_data, fee_date):
-        pass
+    def load_fin_data(self, data):
+        self.vault = int(data["vault"])
+        self.late_fee = int(data["late_fee"])
