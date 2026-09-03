@@ -53,16 +53,23 @@ class Recorder:
                 "title": books_dict[book_id].title,
                 "price": books_dict[book_id].price,
                 "author": books_dict[book_id].author,
-                "id": books_dict[book_id].id
+                "id": books_dict[book_id].id,
+                "borrowed": books_dict[book_id].borrowed
             }
         with open("./data/books.json", mode="w") as books_file:
             json.dump(formatted_books, books_file, indent=4)
 
     def load_bookdata(self):
-        pass
+        try:
+            with open("./data/bookdata.json") as bookdata_file:
+                data = json.load(bookdata_file)
+                return data
+        except json.JSONDecodeError:
+            return {}
 
-    def save_bookdata(self):
-        pass
+    def save_bookdata(self, bookdata_dict):
+        with open("./data/bookdata.json", mode="w") as bookdata_file:
+            json.dump(bookdata_dict, bookdata_file, indent=4)
 
     def load_borrow_record(self):
         pass

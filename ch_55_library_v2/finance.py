@@ -1,8 +1,9 @@
 
 class Finance:
     def __init__(self):
-        self.vault = 100000
-        self.late_fee = 2
+        self.vault = None
+        self.late_fee = None
+        self.library_fee = None
 
     def calculate_late_fee(self, days):
         if days > 0:
@@ -10,6 +11,12 @@ class Finance:
 
     def check_vault(self):
         return self.vault
+
+    def check_late_fee(self):
+        return self.late_fee
+
+    def check_library_fee(self):
+        return self.library_fee
 
     def check_balance_available_or_not(self, book_price):
         return self.vault > book_price
@@ -23,16 +30,25 @@ class Finance:
     def late_fee_data(self):
         return f'''This is the current late fee. Rs:- {self.late_fee}/- per Day.'''
 
+    def library_fee_data(self):
+        return f"This is the current Library Fee. Rs:- {self.library_fee}/- per Year."
+
     def change_late_fee(self, new_fee):
         self.late_fee = new_fee
         return f"Late fee has been changed successfully. Here is the new Late Fee. Rs:- {new_fee}/- per Day"
 
+    def change_library_fee(self, new_fee):
+        self.library_fee = new_fee
+        return f"Library Fee has been changed successfully. Here is the new Library Fee. Rs:- {new_fee}/- per Year."
+
     def to_dict(self):
         return {
             "vault": self.vault,
-            "late_fee": self.late_fee
+            "late_fee": self.late_fee,
+            "library_fee": self.library_fee
         }
 
     def load_fin_data(self, data):
         self.vault = int(data["vault"])
         self.late_fee = int(data["late_fee"])
+        self.library_fee = int(data["library_fee"])

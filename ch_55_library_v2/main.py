@@ -9,6 +9,7 @@ display = Display()
 usr_input = UserInput()
 library = Library()
 
+#* === The Member Login ===
 def login_flow():
     display.enter_id()
     member_id = usr_input.text_input()
@@ -32,6 +33,7 @@ def login_flow():
         display.invalid_input()
         return None
 
+#* === The Member Sign Up ===
 def sign_up_flow():
     display.enter_name()
     member_name = usr_input.text_input()
@@ -56,10 +58,22 @@ def sign_up_flow():
                                 member_confirmed_password = usr_input.text_input()
                                 if member_confirmed_password:
                                     if member_password == member_confirmed_password:
-                                        account_creation_data = library.create_member(member_name, round(member_age), member_user_id, member_password)
-                                        display.show_readymade_data(account_creation_data)
-                                        library.save_data()
-                                        return True
+                                        library_fee = library.finance.check_library_fee()
+                                        display.pay_library_fee(library_fee)
+                                        paid_fee = usr_input.number_input()
+                                        if paid_fee:
+                                            if paid_fee == library_fee:
+                                                library.finance.add_amount(paid_fee)
+                                                account_creation_data = library.create_member(member_name, round(member_age), member_user_id, member_password)
+                                                display.show_readymade_data(account_creation_data)
+                                                library.save_data()
+                                                return True
+                                            else:
+                                                display.incorrect_payment()
+                                                return False
+                                        else:
+                                            display.invalid_input()
+                                            return False
                                     else:
                                         display.incorrect_password()
                                         return False
@@ -81,7 +95,9 @@ def sign_up_flow():
         display.invalid_input()
         return False
 
+#* === Admin After Login ===
 def admin_logged_in():
+    #? Note:- I should have used a dispatcher function.
     while True:
         display.admin_primary_display()
         admin_input = usr_input.text_input()
@@ -136,20 +152,163 @@ def admin_logged_in():
             display.enter_new_late_fee()
             new_late_fee = usr_input.number_input()
             if new_late_fee:
-                changed_data = library.finance.change_late_fee(round(abs(new_late_fee)))
-                display.show_readymade_data(changed_data)
+                changed_late_fee_data = library.finance.change_late_fee(round(abs(new_late_fee)))
+                display.show_readymade_data(changed_late_fee_data)
+                library.save_data()
+            else:
+                display.invalid_input()
+        elif admin_input == "5":
+            library_fee_data = library.finance.library_fee_data()
+            display.show_readymade_data(library_fee_data)
+            display.enter_new_library_fee()
+            new_library_fee = usr_input.number_input()
+            if new_library_fee:
+                changed_library_fee_data = library.finance.change_library_fee(round(abs(new_library_fee)))
+                display.show_readymade_data(changed_library_fee_data)
+                library.save_data()
             else:
                 display.invalid_input()
         else:
             display.invalid_input()
 
 
+#* === Member After Login ===
+def search_book_by_author():
+    display.enter_author_name()
+    the_author_name = usr_input.text_input()
+    if the_author_name:
+        book_list = library.get_books_by_author(the_author_name)
+        if book_list:
+            display.check_individual_book(the_author_name)
+            book_serial = 0
+            for book in book_list:
+                book_serial += 1
+                display.show_book_with_id(book_serial, book.title, book.id)
+        else:
+            display.no_book_by_author(the_author_name)
+    else:
+        display.invalid_input()
 
+def search_book_by_title():
+    display.enter_book_title()
+    the_book_title = usr_input.text_input()
+    if the_book_title:
+        the_book = library.get_book_by_title(the_book_title)
+        if the_book:
+            if not the_book.borrowed:
+                book_data = f'''
+Title:  {the_book.title}
+Price:  {the_book.price}/-
+Author: {the_book.author}
+ID:     {the_book.id}
+    '''
+                display.show_readymade_data(book_data)
+            else:
+                display.borrowed_by_someone(the_book.title)
+        else:
+            display.no_book_available(the_book_title)
+    else:
+        display.invalid_input()
 
+def search_book_by_id():
+    display.enter_book_id()
+    the_book_id = usr_input.text_input()
+    if the_book_id:
+        the_book = library.get_book(the_book_id)
+        if the_book:
+            if not the_book.borrowed:
+                book_data = f'''
+Title:  {the_book.title}
+Price:  {the_book.price}/-
+Author: {the_book.author}
+ID:     {the_book.id}
+    '''
+                display.show_readymade_data(book_data)
+            else:
+                display.borrowed_by_someone(the_book.title)
+        else:
+            display.invalid_book_id(the_book_id)
+    else:
+        display.invalid_input()
 
+def borrow_book(mem):
+    cart = {}
+    while True:
+        display.borrow_books_primary_display()
+        display.books_in_cart(len(cart))
+        display.enter_book_id()
+        entered_book_id = usr_input.text_input()
+        if entered_book_id:
+            if entered_book_id.lower() == "cancel":
+                display.borrow_procedure_terminated()
+                break
+            elif entered_book_id.lower() == "checkout":
+                display.about_to_borrow()
+                for book_id in cart:
+                    display.show_book_for_borrow(cart[book_id].title, cart[book_id].author)
+                checkout_consent = usr_input.text_input()
+                if checkout_consent:
+                    if checkout_consent.lower() == "confirm":
+                        late_fee = library.finance.check_late_fee()
+                        display.for_how_many_days(late_fee)
+                        borrow_days = usr_input.number_input()
+                        if borrow_days:
+                            borrow_data = library.borrow_book_by_customer(cart, round(abs(borrow_days)), mem)
+                            display.show_readymade_data(borrow_data)
+                            break
+                        else:
+                            display.invalid_input()
+                    elif checkout_consent.lower() == "remove":
+                        display.books_in_cart(len(cart))
+                        display.about_to_remove_from_cart()
+                        display.enter_book_id()
+                        book_id_for_removal = usr_input.text_input()
+                        if book_id_for_removal:
+                            if book_id_for_removal in cart:
+                                removed_book = cart.pop(book_id_for_removal)
+                                display.book_removed_from_cart(removed_book.title)
+                            else:
+                                display.invalid_book_id(book_id_for_removal)
+                        else:
+                            display.invalid_input()
+                    elif checkout_consent.lower() == "cancel":
+                        display.borrow_procedure_terminated()
+                        break
+                    else:
+                        display.invalid_input()
+                else:
+                    display.invalid_input()
+            else:
+                the_book = library.get_book(entered_book_id)
+                if the_book:
+                    if the_book.id in cart:
+                        display.already_inside_cart(the_book.title, the_book.author)
+                    else:
+                        #! If book is already borrowed | Not Checked
+                        cart[the_book.id] = the_book
+                        display.book_added_to_cart(the_book.title)
+                else:
+                    display.invalid_book_id(entered_book_id)
+        else:
+            display.invalid_input()
 
+def return_book(mem):
+    print("You Pressed 5")
 
+def command_mapper(member, mem_input):
+    saved_commands = {
+        "1": search_book_by_author,
+        "2": search_book_by_title,
+        "3": search_book_by_id,
+        "4": borrow_book,
+        "5": return_book,
+    }
+    if mem_input in ["1", "2", "3"]:
+        saved_commands[mem_input]()
+    else:
+        saved_commands[mem_input](member)
 
+#* === The Main Program ===
 library_open = True
 while library_open:
     display.primary_screen()
@@ -166,8 +325,7 @@ while library_open:
                     member_logged_in = False
                     display.logged_out(the_member.name)
                 elif member_input in ["1", "2", "3", "4", "5"]:
-                    #! Command Mapper needed with member object
-                    ...
+                    command_mapper(the_member, member_input)
                 else:
                     display.invalid_input()
         else:

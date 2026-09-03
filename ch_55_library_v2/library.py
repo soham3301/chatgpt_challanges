@@ -1,4 +1,6 @@
 
+#? Note:- There is no Stock Tracking the number of books. Missed this concept.
+
 from admin import Admin
 from member import Member
 from book import Book
@@ -38,18 +40,21 @@ class Library:
             return False
 
     def get_book(self, book_id):
-        return self.books[book_id]
+        if book_id in self.books:
+            return self.books[book_id]
+        else:
+            return None
 
     def get_book_by_title(self, title):
-        the_book_id = self.bookdata["title"][title]
-        if the_book_id:
+        if title in self.bookdata["title"]:
+            the_book_id = self.bookdata["title"][title]
             return self.get_book(the_book_id)
         else:
             return None
 
     def get_books_by_author(self, author):
-        book_id_list = self.bookdata["author"][author]
-        if book_id_list:
+        if author in self.bookdata["author"]:
+            book_id_list = self.bookdata["author"][author]
             book_list = []
             for book_id in book_id_list:
                 the_book = self.get_book(book_id)
@@ -75,6 +80,12 @@ Login to Library using your ID: {u_id} and Password
         self.finance.spend_amount(price)
         book_id = new_book.generate_book_id()
         self.books[book_id] = new_book
+        if new_book.author in self.bookdata["author"]:
+            self.bookdata["author"][new_book.author].append(new_book.id)
+        else:
+            self.bookdata["author"][new_book.author] = []
+            self.bookdata["author"][new_book.author].append(new_book.id)
+        self.bookdata["title"][new_book.title] = new_book.id
         return f'''
 The Book has been successfully added to library.
 Title: {title}
@@ -83,15 +94,24 @@ Price: {price} INR
 Book ID: {book_id}
 '''
 
+    def borrow_book_by_customer(self, cart, days, member):
+        if cart:
+            #! Start from Here.
+            ...
+        else:
+            return f"No Book is added to the cart."
+
     def save_data(self):
         self.recorder.save_admin(self.admin.to_dict())
         self.recorder.save_members(self.members)
         self.recorder.save_books(self.books)
-        self.recorder.save_bookdata()
+        self.recorder.save_bookdata(self.bookdata)
         self.recorder.save_borrow_record()
         self.recorder.save_finance(self.finance.to_dict())
 
     def load_data(self):
+        #? Note:- Here I am loading all data as soon as the server runs. But in a real library, there will be millions of books.
+        #? Note:- I think the book data should remain in database and when customer asks, only then the book data should be fetched to backend code.
         admin_data = self.recorder.load_admin()
         self.admin.load_data(admin_data)
         member_data = self.recorder.load_members()
@@ -106,11 +126,12 @@ Book ID: {book_id}
         if book_data:
             for book_id in book_data:
                 new_book = Book(book_data[book_id]["title"], int(book_data[book_id]["price"]), book_data[book_id]["author"])
-                new_book.load_book_id(book_data[book_id]["id"])
+                new_book.load_book_data(book_data[book_id]["id"], book_data[book_id]["borrowed"])
                 self.books[new_book.id] = new_book
         else:
             self.books = book_data
-        #* SPACE FOR BOOKDATA
+        bookdata_data = self.recorder.load_bookdata()
+        self.bookdata = bookdata_data
         #* SPACE FOR BORROW RECORD
         finance_data = self.recorder.load_finance()
         self.finance.load_fin_data(finance_data)

@@ -1,4 +1,7 @@
 
+
+#? Note:- There should be a system to track when this account is created.
+
 class Member:
     def __init__(self, name, age, user_id, user_password):
         self.name = name
@@ -12,3 +15,9 @@ class Member:
 
     def load_borrowed_book_ids(self, id_list):
         self.borrowed_book_ids = id_list
+
+    def append_book_ids(self, book_id):
+        self.borrowed_book_ids.append(book_id)
+
+    def clear_book_ids(self, book_id):
+        self.borrowed_book_ids.remove(book_id)

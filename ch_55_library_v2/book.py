@@ -7,6 +7,7 @@ class Book:
         self.price = price
         self.author = author
         self.id = None
+        self.borrowed = False
 
     def generate_book_id(self):
         first_l = self.title[0]
@@ -19,5 +20,6 @@ class Book:
         self.id = ''.join(random.sample(the_random_id, len(the_random_id)))
         return self.id
 
-    def load_book_id(self, b_id):
+    def load_book_data(self, b_id, borrow_condition):
         self.id = b_id
+        self.borrowed = borrow_condition
