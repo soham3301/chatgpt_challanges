@@ -20,8 +20,12 @@ class Finance:
     def add_amount(self, amount):
         self.vault += amount
 
+    def late_fee_data(self):
+        return f'''This is the current late fee. Rs:- {self.late_fee}/- per Day.'''
+
     def change_late_fee(self, new_fee):
         self.late_fee = new_fee
+        return f"Late fee has been changed successfully. Here is the new Late Fee. Rs:- {new_fee}/- per Day"
 
     def to_dict(self):
         return {

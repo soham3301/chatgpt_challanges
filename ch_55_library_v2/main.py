@@ -131,7 +131,15 @@ def admin_logged_in():
             fund_data = library.finance.check_vault()
             display.show_fund(fund_data)
         elif admin_input == "4":
-            ...
+            late_fee_data = library.finance.late_fee_data()
+            display.show_readymade_data(late_fee_data)
+            display.enter_new_late_fee()
+            new_late_fee = usr_input.number_input()
+            if new_late_fee:
+                changed_data = library.finance.change_late_fee(round(abs(new_late_fee)))
+                display.show_readymade_data(changed_data)
+            else:
+                display.invalid_input()
         else:
             display.invalid_input()
 

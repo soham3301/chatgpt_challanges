@@ -80,6 +80,9 @@ class Display:
     def show_fund(self, amount):
         print(f"The Library has Rs:- {amount}/- Fund Left")
 
+    def enter_new_late_fee(self):
+        print("Enter new Late Fee")
+
     def insufficient_fund(self):
         print("Insufficient Fund")
 
