@@ -28,13 +28,7 @@ class Recorder:
     def save_members(self, members_dict):
         formatted_members = {}
         for member_id in members_dict:
-            formatted_members[member_id] = {
-                "name": members_dict[member_id].name,
-                "age": members_dict[member_id].age,
-                "user_id": members_dict[member_id].user_id,
-                "user_pass": members_dict[member_id].user_pass,
-                "borrowed_book_ids": members_dict[member_id].borrowed_book_ids
-            }
+            formatted_members[member_id] = members_dict[member_id].to_dict()
         with open("./data/members.json", mode="w") as member_file:
             json.dump(formatted_members, member_file, indent=4)
 
@@ -72,10 +66,19 @@ class Recorder:
             json.dump(bookdata_dict, bookdata_file, indent=4)
 
     def load_borrow_record(self):
-        pass
+        try:
+            with open("./data/borrow_record.json") as borrow_record_file:
+                data = json.load(borrow_record_file)
+                return data
+        except json.JSONDecodeError:
+            return {}
 
-    def save_borrow_record(self):
-        pass
+    def save_borrow_record(self, borrow_record_dict):
+        formatted_record = {}
+        for book_id in borrow_record_dict:
+            formatted_record[book_id] = borrow_record_dict[book_id].to_dict()
+        with open("./data/borrow_record.json", mode="w") as borrow_record_file:
+            json.dump(formatted_record, borrow_record_file, indent=4)
 
     def load_finance(self):
         try:

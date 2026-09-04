@@ -95,18 +95,58 @@ Book ID: {book_id}
 '''
 
     def borrow_book_by_customer(self, cart, days, member):
+        #? Note:- Here, physical books will be taken by member but the book object will remain in library, only the data changes while borrowing.
         if cart:
-            #! Start from Here.
-            ...
+            for book_id in cart:
+                borrow_transaction = BorrowRecord(book_id, days, member.user_id)
+                the_tran_id = borrow_transaction.generate_tran_id()
+                cart[book_id].borrow_book()
+                self.borrow_record[the_tran_id] = borrow_transaction
+                member.append_book_tran_id(the_tran_id)
+            return f"{member.name}, Thanks for borrowing these {len(cart)} books for {days} days. Enjoy Reading."
         else:
             return f"No Book is added to the cart."
+
+    def get_borrow_transaction(self, tran_id):
+        if tran_id in self.borrow_record:
+            return self.borrow_record[tran_id]
+        else:
+            return None
+
+    def get_book_id_by_borrow_tran(self, tran_id):
+        the_transaction = self.get_borrow_transaction(tran_id)
+        if the_transaction:
+            return the_transaction.book_id
+        else:
+            return None
+
+    def check_late_fee(self, tran_id, holding_days):
+        the_transaction = self.get_borrow_transaction(tran_id)
+        extra_days = the_transaction.check_late_status(holding_days)
+        late_fee = self.finance.calculate_late_fee(extra_days)
+        if late_fee > 0:
+            return True, late_fee
+        else:
+            return False, None
+
+    def accept_late_fee(self, fee):
+        self.finance.add_amount(fee)
+        return f"Rs:- {fee}/- Paid as Late Fee."
+
+    def accept_book_return(self, mem, b_id, t_id, days):
+        the_borrow_transaction = self.get_borrow_transaction(t_id)
+        the_borrow_transaction.update_return_duration(days)
+        the_book = self.get_book(b_id)
+        the_book.book_returned()
+        mem.clear_book_tran_id(t_id)
+        return f"The return of {the_book.title} written by {the_book.author} after {days} days has been accepted by the Library from {mem.name}"
 
     def save_data(self):
         self.recorder.save_admin(self.admin.to_dict())
         self.recorder.save_members(self.members)
         self.recorder.save_books(self.books)
         self.recorder.save_bookdata(self.bookdata)
-        self.recorder.save_borrow_record()
+        self.recorder.save_borrow_record(self.borrow_record)
         self.recorder.save_finance(self.finance.to_dict())
 
     def load_data(self):
@@ -118,7 +158,7 @@ Book ID: {book_id}
         if member_data:
             for member_id in member_data:
                 new_member = Member(member_data[member_id]["name"], member_data[member_id]["age"], member_data[member_id]["user_id"], member_data[member_id]["user_pass"])
-                new_member.load_borrowed_book_ids(member_data[member_id]["borrowed_book_ids"])
+                new_member.load_borrowed_book_tran_ids(member_data[member_id]["borrowed_book_tran_id"])
                 self.members[new_member.user_id] = new_member
         else:
             self.members = member_data
@@ -132,7 +172,14 @@ Book ID: {book_id}
             self.books = book_data
         bookdata_data = self.recorder.load_bookdata()
         self.bookdata = bookdata_data
-        #* SPACE FOR BORROW RECORD
+        borrow_record_data = self.recorder.load_borrow_record()
+        if borrow_record_data:
+            for borrow_tran in borrow_record_data:
+                new_borrow_transaction = BorrowRecord(borrow_record_data[borrow_tran]["book_id"], borrow_record_data[borrow_tran]["borrow_duration"], borrow_record_data[borrow_tran]["member_id"])
+                new_borrow_transaction.load_borrow_data(borrow_record_data[borrow_tran])
+                self.borrow_record[new_borrow_transaction.tran_id] = new_borrow_transaction
+        else:
+            self.borrow_record = borrow_record_data
         finance_data = self.recorder.load_finance()
         self.finance.load_fin_data(finance_data)
 

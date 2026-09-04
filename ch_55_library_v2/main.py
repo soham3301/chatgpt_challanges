@@ -1,5 +1,5 @@
 
-
+#? Note:- A thought, should the main.py do all the user interaction? Can I make another class just to tackle user interaction?
 
 from display import Display
 from user_input import UserInput
@@ -211,6 +211,7 @@ ID:     {the_book.id}
         display.invalid_input()
 
 def search_book_by_id():
+    #? Note:- Here some code repeats. Ignoring it for now.
     display.enter_book_id()
     the_book_id = usr_input.text_input()
     if the_book_id:
@@ -252,9 +253,11 @@ def borrow_book(mem):
                         late_fee = library.finance.check_late_fee()
                         display.for_how_many_days(late_fee)
                         borrow_days = usr_input.number_input()
+                        #? Note:- A person can borrow a book for unlimited days. No upper time limit has been set.
                         if borrow_days:
                             borrow_data = library.borrow_book_by_customer(cart, round(abs(borrow_days)), mem)
                             display.show_readymade_data(borrow_data)
+                            library.save_data()
                             break
                         else:
                             display.invalid_input()
@@ -283,8 +286,9 @@ def borrow_book(mem):
                 if the_book:
                     if the_book.id in cart:
                         display.already_inside_cart(the_book.title, the_book.author)
+                    elif the_book.borrowed:
+                        display.borrowed_by_someone(the_book.title)
                     else:
-                        #! If book is already borrowed | Not Checked
                         cart[the_book.id] = the_book
                         display.book_added_to_cart(the_book.title)
                 else:
@@ -293,7 +297,47 @@ def borrow_book(mem):
             display.invalid_input()
 
 def return_book(mem):
-    print("You Pressed 5")
+    borrowed_book_id_with_tran_id = {}
+    for tran_id in mem.borrowed_book_tran_id:
+        book_id = library.get_book_id_by_borrow_tran(tran_id)
+        borrowed_book_id_with_tran_id[book_id] = tran_id
+    if borrowed_book_id_with_tran_id:
+        display.book_return_primary_screen()
+        display.enter_book_id()
+        entered_book_id = usr_input.text_input()
+        if entered_book_id:
+            if entered_book_id in borrowed_book_id_with_tran_id:
+                display.after_how_many_days()
+                number_of_days = usr_input.number_input()
+                #? Note:- This number (how many days have passed) should be system / librarian generated. Here I am asking the user, avoiding date time module.
+                if number_of_days:
+                    is_late_fee_needed, the_late_fee = library.check_late_fee(borrowed_book_id_with_tran_id[entered_book_id], number_of_days)
+                    if is_late_fee_needed:
+                        display.enter_the_late_fee(the_late_fee)
+                        entered_late_fee = usr_input.number_input()
+                        if entered_late_fee:
+                            if the_late_fee == entered_late_fee:
+                                late_fee_data = library.accept_late_fee(the_late_fee)
+                                display.show_readymade_data(late_fee_data)
+                                return_book_data = library.accept_book_return(mem, entered_book_id, borrowed_book_id_with_tran_id[entered_book_id], number_of_days)
+                                display.show_readymade_data(return_book_data)
+                                library.save_data()
+                            else:
+                                display.late_fee_didnot_match(the_late_fee, entered_late_fee)
+                        else:
+                            display.invalid_input()
+                    else:
+                        return_book_data_without_fee = library.accept_book_return(mem, entered_book_id, borrowed_book_id_with_tran_id[entered_book_id], number_of_days)
+                        display.show_readymade_data(return_book_data_without_fee)
+                        library.save_data()
+                else:
+                    display.invalid_input()
+            else:
+                display.not_borrowed(entered_book_id)
+        else:
+            display.invalid_input()
+    else:
+        display.nothing_to_return()
 
 def command_mapper(member, mem_input):
     saved_commands = {

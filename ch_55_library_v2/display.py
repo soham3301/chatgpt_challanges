@@ -99,6 +99,24 @@ class Display:
     def borrowed_by_someone(self, title):
         print(f"{title} has been borrowed by someone. Check again after a few days")
 
+    def nothing_to_return(self):
+        print("You have not borrowed any book, there is nothing to return.")
+
+    def book_return_primary_screen(self):
+        print("You can return one book after another. Kindly enter the book ID of the book you want to return.")
+
+    def not_borrowed(self, book_id):
+        print(f"This book ID {book_id} is wrong. You have not borrowed this book.")
+
+    def after_how_many_days(self):
+        print("How many days have passed since you borrowed this book? Enter the number of days.")
+
+    def enter_the_late_fee(self, fee):
+        print(f"Please pay the late fee of Rs:- {fee}/- below for further procedure. The value should be exactly same.")
+
+    def late_fee_didnot_match(self, fee, entered_fee):
+        print(f"You paid Rs:- {entered_fee}/- which is not as same as Rs:- {fee}/-.")
+
     def logged_out(self, name):
         print(f"Thanks {name} for visiting our Library")
 

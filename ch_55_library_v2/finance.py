@@ -8,6 +8,8 @@ class Finance:
     def calculate_late_fee(self, days):
         if days > 0:
             return self.late_fee * days
+        else:
+            return 0
 
     def check_vault(self):
         return self.vault

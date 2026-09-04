@@ -23,3 +23,9 @@ class Book:
     def load_book_data(self, b_id, borrow_condition):
         self.id = b_id
         self.borrowed = borrow_condition
+
+    def borrow_book(self):
+        self.borrowed = True
+
+    def book_returned(self):
+        self.borrowed = False
